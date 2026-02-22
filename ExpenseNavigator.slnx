@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="expensenavigator.client/expensenavigator.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="ExpenseNavigator.Server/ExpenseNavigator.Server.csproj" />
+</Solution>

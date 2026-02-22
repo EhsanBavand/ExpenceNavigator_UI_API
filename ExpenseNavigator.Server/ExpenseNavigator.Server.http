@@ -1,0 +1,6 @@
+@ExpenseNavigator.Server_HostAddress = http://localhost:5192
+
+GET {{ExpenseNavigator.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
