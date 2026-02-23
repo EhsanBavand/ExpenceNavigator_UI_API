@@ -1,68 +1,85 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Sidebar = ({ isOpen, onToggle, isDesktop }) => {
-  const handleItemClick = () => {
-    if (!isDesktop) onToggle(); // Close only on mobile
-  };
+    const mobileState = isDesktop ? "" : isOpen ? "open" : "closed";
 
-  return (
-    <>
-      <div
-        className={`sidebar p-3 ${isOpen ? "d-block" : "d-none"} d-md-block`}
-      >
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h5 className="mb-0">💰 ExpenseNav</h5>
-          <button
-            className="btn btn-sm btn-outline-secondary d-md-none"
-            onClick={onToggle}
-            aria-label="Close sidebar"
-          >
-            <i className="bi bi-x-lg" />
-          </button>
-        </div>
+    const handleItemClick = () => {
+        if (!isDesktop && onToggle) onToggle();
+    };
 
-        <ul className="nav flex-column">
-          {[
-            {
-              path: "/dashboard",
-              icon: "bi-house-door-fill",
-              label: "Dashboard",
-            },
-            { path: "/income", icon: "bi-cash-coin", label: "Income" },
-            {
-              path: "/expenses",
-              icon: "bi-cart-check-fill",
-              label: "Expenses",
-            },
-            { path: "/saving", icon: "bi-piggy-bank-fill", label: "Saving" },
-            {
-              /* { path: "/settings", icon: "bi-gear-fill", label: "Settings" }, */
-            },
-          ].map((item) => (
-            <li className="nav-item" key={item.path}>
-              <Link
-                className="nav-link"
-                to={item.path}
-                onClick={handleItemClick}
-              >
-                <i className={`bi ${item.icon} me-2`} /> {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+    return (
+        <>
+            <aside className={`sidebar-root ${mobileState}`}>
+                {/* Header */}
+                <div className="sidebar-header">
+                    <h6 className="sidebar-brand">
+                        <span className="brand-dot" />
+                        Expense Navigator
+                    </h6>
 
-      {/* Dim overlay only on mobile when open */}
-      {isOpen && !isDesktop && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-md-none"
-          onClick={onToggle}
-          style={{ zIndex: 1030 }}
-        />
-      )}
-    </>
-  );
+                    {!isDesktop && (
+                        <button className="sidebar-close" onClick={onToggle} aria-label="Close sidebar">
+                            <i className="bi bi-x-lg" />
+                        </button>
+                    )}
+                </div>
+
+                {/* Content */}
+                <div className="sidebar-content">
+                    <div className="sidebar-section">Main</div>
+                    <ul className="sidebar-nav">
+                        <li>
+                            <NavLink
+                                to="/dashboard"
+                                className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+                                onClick={handleItemClick}
+                            >
+                                <span className="sidebar-icon"><i className="bi bi-house-door-fill" /></span>
+                                <span>Dashboard</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/income"
+                                className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+                                onClick={handleItemClick}
+                            >
+                                <span className="sidebar-icon"><i className="bi bi-cash-coin" /></span>
+                                <span>Income</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/expenses"
+                                className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+                                onClick={handleItemClick}
+                            >
+                                <span className="sidebar-icon"><i className="bi bi-cart-check-fill" /></span>
+                                <span>Expenses</span>
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/saving"
+                                className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+                                onClick={handleItemClick}
+                            >
+                                <span className="sidebar-icon"><i className="bi bi-piggy-bank-fill" /></span>
+                                <span>Savings</span>
+                            </NavLink>
+                        </li>
+                    </ul>
+                </div>
+
+                {/* Footer */}
+                <div className="sidebar-footer">© {new Date().getFullYear()} Expense Navigator</div>
+            </aside>
+
+            {/* Mobile overlay */}
+            {!isDesktop && isOpen && <div className="sidebar-overlay" onClick={onToggle} />}
+        </>
+    );
 };
 
 export default Sidebar;

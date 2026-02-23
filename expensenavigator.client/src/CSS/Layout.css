@@ -1,70 +1,20 @@
- /*Layout.css*/
-/*
-.layout-container {
-  display: flex;
-  min-height: 100vh;
-}
-
-.main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  transition: margin-left 0.3s ease;
-}
-
-@media (min-width: 768px) {
-  .main-content.sidebar-open {
-    margin-left: 250px; 
-  }
-}
-
-@media (max-width: 767.98px) {
-  .main-content {
-    margin-left: 0 !important;
-  }
-} */
-
-/* Layout.css */
-:root {
-    --sidebar-w: 250px;
-}
-
+/* Minimal layout scaffolding */
 .layout-container {
     display: flex;
     min-height: 100vh;
-    overflow-x: hidden; /* prevent horizontal bounce */
+    overflow-x: hidden;
 }
 
 .main-content {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    transition: margin-left 0.3s ease;
+    transition: margin-left .3s ease;
 }
 
-@media (min-width: 768px) {
-    /* Only add space when we're desktop AND the app is marked as 'sidebar-open' */
-    .layout-container.desktop .main-content.sidebar-open {
-        margin-left: var(--sidebar-w);
-    }
-}
-
-/* On small screens the sidebar overlays; content should never shift */
+/* Do NOT add sidebar width here; modern-theme.css handles .with-sidebar */
 @media (max-width: 767.98px) {
     .main-content {
         margin-left: 0 !important;
     }
-}
-
-/* Sidebar itself */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100dvh;
-    width: var(--sidebar-w);
-    background: #fff;
-    z-index: 1040;
-    border-right: 1px solid rgba(0, 0, 0, 0.125);
-    overflow-y: auto;
 }

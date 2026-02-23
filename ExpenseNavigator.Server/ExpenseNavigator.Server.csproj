@@ -4,9 +4,6 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <!--<SpaRoot>..\expensenavigator.client</SpaRoot>-->
-    <!--<SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>-->
-    <!--<SpaProxyServerUrl>https://localhost:54692</SpaProxyServerUrl>-->
   </PropertyGroup>
 
   <ItemGroup>

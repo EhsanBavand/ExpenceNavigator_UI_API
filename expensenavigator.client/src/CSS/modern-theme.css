@@ -1,0 +1,642 @@
+/* ============================
+   Ehsan's Modern Token Theme
+   ============================ */
+
+:root {
+    /* Base */
+    --background: 210 20% 98%;
+    --foreground: 220 25% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+    --primary: 162 63% 41%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 220 25% 20%;
+    --muted: 210 15% 95%;
+    --muted-foreground: 220 10% 50%;
+    --accent: 162 50% 95%;
+    --accent-foreground: 162 63% 30%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 162 63% 41%;
+    --radius: .75rem;
+    /* Fonts + shadows */
+    --font-display: "Plus Jakarta Sans", sans-serif;
+    --font-body: "Inter", sans-serif;
+    --shadow-card: 0 1px 3px hsl(220 25% 10% / .04), 0 1px 2px -1px hsl(220 25% 10% / .04);
+    /* Controls */
+    --control-h: 40px;
+    /* Sidebar tokens */
+    --sidebar-background: 220 25% 8%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 162 63% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 14%;
+    --sidebar-accent-foreground: 210 15% 90%;
+    --sidebar-border: 220 20% 16%;
+    --sidebar-ring: 162 63% 50%;
+    --sidebar-muted: 220 15% 45%;
+    /* Optional gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(162, 63%, 41%), hsl(162, 80%, 55%));
+    --gradient-income: linear-gradient(135deg, hsl(162, 63%, 41%), hsl(142, 71%, 45%));
+    --gradient-expense: linear-gradient(135deg, hsl(0, 72%, 51%), hsl(20, 80%, 55%));
+    --gradient-saving: linear-gradient(135deg, hsl(217, 91%, 60%), hsl(240, 80%, 65%));
+}
+
+/* Typography / base */
+body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: hsl(var(--foreground));
+}
+
+/* Page title + very light underline */
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 .5rem;
+}
+
+.page-header-line {
+    height: 1px;
+    background-color: hsl(var(--border));
+    margin-bottom: 1rem;
+}
+
+/* Panels (cards) */
+.panel {
+    background-color: hsl(var(--card));
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+    margin-bottom: 1rem;
+}
+
+.panel-header {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid hsl(var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.panel-body {
+    padding: 1rem;
+}
+
+.panel-title {
+    margin: 0;
+    font-weight: 700;
+    font-family: var(--font-display);
+}
+
+/* Toolbar (filters) */
+.toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+
+    .toolbar .form-label {
+        margin-bottom: .35rem;
+        font-weight: 600;
+        color: hsl(var(--foreground));
+    }
+
+    /* Inputs / selects */
+    .control-pill,
+    .toolbar .form-select,
+    .toolbar .form-control {
+        height: var(--control-h);
+        border-radius: var(--radius) !important;
+        border: 1px solid hsl(var(--input)) !important;
+        padding: 0 .75rem !important;
+        background-color: #fff !important;
+        font-family: var(--font-body);
+    }
+
+/* Buttons */
+.btn-pill {
+    height: var(--control-h);
+    border-radius: var(--radius) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: 0 .9rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+}
+
+.btn-green {
+    background-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+    border: none !important;
+}
+
+.btn-blue {
+    background-color: hsl(var(--info)) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+.btn-ghost {
+    background-color: hsl(var(--secondary)) !important;
+    color: hsl(var(--secondary-foreground)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+}
+
+    .btn-ghost:hover {
+        background-color: hsl(var(--accent)) !important;
+    }
+
+/* Tables */
+.table-rounded {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+}
+
+.table-soft thead th {
+    background-color: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    border-bottom: 1px solid hsl(var(--border));
+    font-family: var(--font-display);
+    font-weight: 600;
+}
+
+.table-soft tbody td {
+    color: hsl(var(--foreground));
+    font-family: var(--font-body);
+    vertical-align: middle;
+}
+
+/* Badges */
+.badge-soft {
+    border-radius: var(--radius);
+    padding: 2px 8px;
+    font-size: .7rem;
+    font-weight: 600;
+}
+
+    .badge-soft.success {
+        background-color: hsl(var(--accent));
+        color: hsl(var(--accent-foreground));
+    }
+
+/* ===========================================================
+   SIDEBAR (token-based)
+   =========================================================== */
+
+.sidebar-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 16rem; /* 256px */
+    display: flex;
+    flex-direction: column;
+    background-color: hsl(var(--sidebar-background));
+    color: hsl(var(--sidebar-foreground));
+    border-right: 1px solid hsl(var(--sidebar-border));
+    z-index: 1040;
+    transform: translateX(0);
+    transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .875rem 1rem;
+    border-bottom: 1px solid hsl(var(--sidebar-border));
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: .2px;
+    color: hsl(var(--sidebar-foreground));
+    margin: 0;
+}
+
+    .sidebar-brand .brand-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: hsl(var(--sidebar-primary));
+        box-shadow: 0 0 0 4px hsl(var(--sidebar-accent) / .6);
+    }
+
+.sidebar-content {
+    padding: .75rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+.sidebar-section {
+    padding: .5rem .75rem;
+    color: hsl(var(--sidebar-muted));
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin: .25rem 0;
+}
+
+.sidebar-footer {
+    padding: .75rem 1rem;
+    border-top: 1px solid hsl(var(--sidebar-border));
+    color: hsl(var(--sidebar-muted));
+    font-size: .825rem;
+}
+
+/* Nav list */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .625rem .75rem;
+    color: hsl(var(--sidebar-foreground));
+    text-decoration: none;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    transition: all .2s ease;
+    font-weight: 500;
+    font-family: var(--font-body);
+}
+
+    .sidebar-link:hover {
+        background-color: hsl(var(--sidebar-accent));
+        color: hsl(var(--sidebar-accent-foreground));
+    }
+
+    .sidebar-link.active {
+        background-color: hsl(var(--sidebar-primary));
+        color: hsl(var(--sidebar-primary-foreground));
+        box-shadow: 0 4px 6px -1px hsl(220 25% 10% / .1), 0 2px 4px -2px hsl(220 25% 10% / .1);
+    }
+
+/* Icon bubble */
+.sidebar-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: calc(var(--radius) - 4px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+    font-size: 14px;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.sidebar-link.active .sidebar-icon {
+    background: hsl(var(--sidebar-primary-foreground) / .2);
+    color: hsl(var(--sidebar-primary-foreground));
+}
+
+/* Mobile close + overlay */
+.sidebar-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--sidebar-border));
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .25);
+    z-index: 1030;
+}
+
+/* Mobile slide in/out */
+@media (max-width: 767.98px) {
+    .sidebar-root.closed {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-root.open {
+        transform: translateX(0);
+    }
+}
+
+/* Desktop pushes content */
+@media (min-width: 768px) {
+    .with-sidebar {
+        margin-left: 16rem;
+    }
+}
+
+/* Mobile table + header tweaks */
+@media (max-width: 576px) {
+    .panel-header .d-flex.gap-2 {
+        flex-direction: column;
+    }
+
+    .panel-header .btn {
+        width: 100%;
+    }
+
+    .table-soft thead th, .table-soft tbody td {
+        padding: .55rem .6rem;
+        font-size: .92rem;
+    }
+}
+
+/* ===========================================================
+   Select chevron for .control-pill (Month/Year)
+   =========================================================== */
+
+/* Reset native arrows so we can draw our own */
+select.control-pill,
+.toolbar select.control-pill,
+.panel-body select.control-pill {
+    appearance: none; /* Standard */
+    -webkit-appearance: none; /* Safari/Chromium */
+    -moz-appearance: none; /* Firefox */
+    background-color: #fff; /* ensure white base so SVG looks clean */
+    background-image: none !important; /* remove Bootstrap default */
+}
+
+/* Draw a custom chevron using an inline SVG */
+select.control-pill,
+.toolbar select.control-pill,
+.panel-body select.control-pill {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'%3e%3cpath d='M4 6l4 4 4-4' stroke='%23111827' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 14px 14px;
+    padding-right: 2rem !important; /* make space for the chevron */
+    line-height: 1.2;
+}
+
+    /* Optional softer chevron tone: replace %23111827 with %236b7280 to use #6B7280 */
+    /*
+select.control-pill,
+.toolbar select.control-pill,
+.panel-body select.control-pill {
+  background-image:
+    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'%3e%3cpath d='M4 6l4 4 4-4' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+}
+*/
+
+    /* Focus ring (consistent) */
+    select.control-pill:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25); /* subtle green ring */
+    }
+
+    /* Legacy/Edge */
+    select.control-pill::-ms-expand {
+        display: none;
+    }
+
+/* =====================================
+   Savings Cards + Progress
+   ===================================== */
+.savings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.saving-card {
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 1rem;
+    position: relative;
+}
+
+    .saving-card .card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: .5rem;
+    }
+
+.icon-bubble {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+    font-size: 18px;
+}
+
+.actions {
+    display: inline-flex;
+    gap: .5rem;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    background: transparent;
+    color: hsl(var(--foreground));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.saving-card .title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    margin: 0;
+}
+
+.saving-card .value {
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+/* Progress bar */
+.progress-track {
+    height: 8px;
+    background: hsl(var(--muted));
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-saving);
+}
+
+small.muted {
+    color: hsl(var(--muted-foreground));
+}
+/* ===========================================================
+   MOBILE-RESPONSIVE UTILITIES & TABLE-TO-CARD RULES
+   =========================================================== */
+
+/* Helpers you can apply to any horizontal control bar */
+.stack-sm {
+    display: flex;
+    gap: .75rem;
+}
+
+.w-100-sm {
+}
+/* becomes width:100% on phones below */
+.full-btn-sm {
+}
+/* becomes full-width on phones below */
+.hide-sm {
+}
+/* hide on phones, show above */
+.show-sm {
+    display: none;
+}
+/* show on phones via media rule */
+
+/* Tablet & up – keep layout as-is */
+@media (min-width: 577px) {
+    .stack-sm {
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+}
+
+/* Phones: stack filters, full-width buttons, tighter paddings */
+@media (max-width: 576px) {
+    /* Panels: slightly tighter padding */
+    .panel-header {
+        padding: .6rem .75rem;
+    }
+
+    .panel-body {
+        padding: .75rem;
+    }
+
+    /* Toolbar: vertical stack and full-width controls */
+    .stack-sm {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .w-100-sm {
+        width: 100% !important;
+    }
+
+    .full-btn-sm {
+        width: 100% !important;
+        justify-content: center;
+    }
+
+    .toolbar {
+        gap: .5rem;
+    }
+
+    /* Buttons: keep decent touch targets */
+    .btn-pill {
+        height: 40px;
+    }
+
+    /* Tables: smaller cell padding */
+    .table-soft thead th,
+    .table-soft tbody td {
+        padding: .55rem .6rem;
+        font-size: .94rem;
+    }
+
+    /* Visibility helpers */
+    .hide-sm {
+        display: none !important;
+    }
+
+    .show-sm {
+        display: block !important;
+    }
+
+    /* =======================================================
+     TABLE ➜ CARD for .table-soft inside .table-rounded
+     Each <tr> becomes a card; each <td> shows a label from data-label
+     ======================================================= */
+    .table-rounded .table.table-soft thead {
+        display: none; /* header hidden on phones */
+    }
+
+    .table-rounded .table.table-soft tbody tr {
+        display: block;
+        background: hsl(var(--card));
+        border: 1px solid hsl(var(--border));
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-card);
+        padding: .65rem .65rem .5rem;
+        margin-bottom: .65rem;
+    }
+
+        .table-rounded .table.table-soft tbody tr td {
+            display: grid;
+            grid-template-columns: 40% 1fr; /* LABEL  VALUE */
+            gap: .35rem .5rem;
+            padding: .35rem 0 !important;
+            border: none !important;
+            align-items: center;
+        }
+
+            .table-rounded .table.table-soft tbody tr td::before {
+                content: attr(data-label);
+                color: hsl(var(--muted-foreground));
+                font-weight: 600;
+                font-size: .82rem;
+            }
+            .table-rounded .table.table-soft tbody tr td[data-actions="true"] {
+                grid-template-columns: 1fr auto;
+            }
+
+    /* Icon buttons hit area */
+    .btn-ghost.btn-sm, .btn.btn-sm {
+        height: 36px;
+        min-width: 36px;
+        border-radius: calc(var(--radius) - 4px);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 .5rem;
+    }
+}

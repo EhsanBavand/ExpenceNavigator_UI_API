@@ -1,33 +1,161 @@
+/* ===========================================================
+   SIDEBAR (uses --sidebar-* tokens from your system)
+   =========================================================== */
 
-/* Sidebar.css */
-
-.sidebar {
-    background-color: #f8f9fa; /* light */
-    border-right: 1px solid #dee2e6;
-    width: 250px;
+.sidebar-root {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-    z-index: 1030;
+    bottom: 0;
+    width: 16rem; /* 256px */
+    display: flex;
+    flex-direction: column;
+    background-color: hsl(var(--sidebar-background));
+    color: hsl(var(--sidebar-foreground));
+    border-right: 1px solid hsl(var(--sidebar-border));
+    z-index: 1040;
+    transform: translateX(0);
+    transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-    /* Hide sidebar by sliding left on small screens */
-    .sidebar.closed {
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .875rem 1rem;
+    border-bottom: 1px solid hsl(var(--sidebar-border));
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: .2px;
+    color: hsl(var(--sidebar-foreground));
+    margin: 0;
+}
+
+    .sidebar-brand .brand-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: hsl(var(--sidebar-primary));
+        box-shadow: 0 0 0 4px hsl(var(--sidebar-accent) / .6);
+    }
+
+.sidebar-content {
+    padding: .75rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+.sidebar-footer {
+    padding: .75rem 1rem;
+    border-top: 1px solid hsl(var(--sidebar-border));
+    color: hsl(var(--sidebar-muted));
+    font-size: .825rem;
+}
+
+/* Nav list */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .625rem .75rem;
+    color: hsl(var(--sidebar-foreground));
+    text-decoration: none;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    transition: all .2s ease;
+    font-weight: 500;
+    font-family: var(--font-body);
+}
+
+    .sidebar-link:hover {
+        background-color: hsl(var(--sidebar-accent));
+        color: hsl(var(--sidebar-accent-foreground));
+    }
+
+    /* Active state = mint pill, subtle shadow */
+    .sidebar-link.active {
+        background-color: hsl(var(--sidebar-primary));
+        color: hsl(var(--sidebar-primary-foreground));
+        box-shadow: 0 4px 6px -1px hsl(220 25% 10% / .1), 0 2px 4px -2px hsl(220 25% 10% / .1);
+    }
+
+/* Icon bubble in link (left of label) */
+.sidebar-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: calc(var(--radius) - 4px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+    font-size: 14px;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.sidebar-link.active .sidebar-icon {
+    background: hsl(var(--sidebar-primary-foreground) / .2);
+    color: hsl(var(--sidebar-primary-foreground));
+}
+
+/* Toggle / close button (mobile only) */
+.sidebar-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--sidebar-border));
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .25); /* dark translucent */
+    z-index: 1030;
+}
+.sidebar-section {
+    padding: .5rem .75rem;
+    color: hsl(var(--sidebar-muted));
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+}
+/* Mobile behavior: slide in/out */
+@media (max-width: 767.98px) {
+    .sidebar-root.closed {
         transform: translateX(-100%);
     }
 
-    /* Show sidebar on small screens */
-    .sidebar.open {
+    .sidebar-root.open {
         transform: translateX(0);
     }
+}
 
-/* Always visible on md and larger */
+/* Desktop: always visible */
 @media (min-width: 768px) {
-    .sidebar {
-        transform: translateX(0) !important;
-        position: fixed;
+    .with-sidebar {
+        margin-left: 16rem;
     }
+    /* keep this in Layout */
 }

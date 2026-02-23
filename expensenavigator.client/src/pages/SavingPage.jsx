@@ -1,565 +1,660 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  getAllSavingAsync,
-  getExtraMoneyByYear,
-  addSavingAsync,
-  updateSavingAsync,
-  deleteSavingAsync,
-} from "../services/api"; // adjust path if needed
+    getAllSavingAsync,
+    getExtraMoneyByYear,
+    addSavingAsync,
+    updateSavingAsync,
+    deleteSavingAsync,
+} from "../services/api";
 
+/**
+ * Savings Page (modern card + table style)
+ * - Goals shown as cards with progress
+ * - Extra allocations in a soft, rounded table (uses your panel/table classes)
+ * - Reuses your modals/handlers to add/edit/delete items and save allocations
+ */
 const SavingPage = () => {
-  const userId = localStorage.getItem("userId"); // must be a GUID string
-  const currentYear = new Date().getFullYear();
+    const userId = localStorage.getItem("userId");
+    const currentYear = new Date().getFullYear();
 
-  // ===============================
-  // State
-  // ===============================
-  const [year, setYear] = useState(String(currentYear));
-  const [items, setItems] = useState([]);
-  const [extraMoney, setExtraMoney] = useState(0);
-  const [allocations, setAllocations] = useState({});
-  const [loading, setLoading] = useState(false);
+    // ===== State =====
+    const [year, setYear] = useState(String(currentYear));
+    const [items, setItems] = useState([]);
+    const [extraMoney, setExtraMoney] = useState(0);
+    const [allocations, setAllocations] = useState({});
+    const [loading, setLoading] = useState(false);
 
-  // Add Modal state
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [mItemName, setMItemName] = useState("");
-  const [mType, setMType] = useState("saving");
-  const [mBalance, setMBalance] = useState("");
-  const [mTarget, setMTarget] = useState("");
-  const [mAmount, setMAmount] = useState("");
+    // Add Modal
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [mItemName, setMItemName] = useState("");
+    const [mType, setMType] = useState("saving");
+    const [mTarget, setMTarget] = useState("");
+    const [mAmount, setMAmount] = useState("");
 
-  // Edit Modal state
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [eId, setEId] = useState(null);
-  const [eItemName, setEItemName] = useState("");
-  const [eType, setEType] = useState("saving");
-  const [eBalance, setEBalance] = useState("");
-  const [eTarget, setETarget] = useState("");
-  const [eAmount, setEAmount] = useState("");
+    // Edit Modal
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [eId, setEId] = useState(null);
+    const [eItemName, setEItemName] = useState("");
+    const [eType, setEType] = useState("saving");
+    const [eAmount, setEAmount] = useState("");
+    const [eTarget, setETarget] = useState("");
 
-  // Delete Modal state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteItem, setDeleteItem] = useState(null);
+    // Delete Modal
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteItem, setDeleteItem] = useState(null);
 
-  // ===============================
-  // Load data
-  // ===============================
-  const reload = async (uid, yr) => {
-    const [savingData, extraMoneyData] = await Promise.all([
-      getAllSavingAsync(uid, yr),
-      getExtraMoneyByYear(uid, yr),
-    ]);
+    // ===== Load data =====
+    const reload = async (uid, yr) => {
+        const [savingData, extraMoneyData] = await Promise.all([
+            getAllSavingAsync(uid, yr),
+            getExtraMoneyByYear(uid, yr),
+        ]);
 
-    setItems(
-      savingData.map((x) => ({
-        id: x.id,
-        name: x.source,
-        type: (String(x.type) || "").toLowerCase(),
-        balance: Number(x.balance) || 0,
-        target: x.target,
-        year: x.year,
-      })),
+        setItems(
+            (savingData || []).map((x) => ({
+                id: x.id,
+                name: x.source,
+                type: (String(x.type) || "").toLowerCase(), // "saving" | "goal" | "debt"
+                balance: Number(x.balance) || 0,
+                target: x.target != null ? Number(x.target) : null,
+                year: x.year,
+            }))
+        );
+
+        setExtraMoney(Number(extraMoneyData ?? 0));
+        setAllocations({});
+    };
+
+    useEffect(() => {
+        if (!userId || !year) return;
+        setLoading(true);
+        reload(userId, year)
+            .catch((err) => console.error("Failed to load savings", err))
+            .finally(() => setLoading(false));
+    }, [userId, year]);
+
+    // ===== Calculations =====
+    const totalAllocated = useMemo(
+        () => Object.values(allocations).reduce((sum, v) => sum + (Number(v) || 0), 0),
+        [allocations]
     );
+    const remaining = Math.max(0, extraMoney - totalAllocated);
 
-    setExtraMoney(Number(extraMoneyData ?? 0));
-    setAllocations({});
-  };
+    const percent = (balance, target) => {
+        if (!target || target <= 0) return 0;
+        return Math.min(100, Math.round((Number(balance || 0) / Number(target)) * 100));
+    };
 
-  useEffect(() => {
-    if (!userId || !year) return;
-    setLoading(true);
-    reload(userId, year)
-      .catch((err) => console.error("Failed to load savings", err))
-      .finally(() => setLoading(false));
-  }, [userId, year]);
+    const currency = (n) =>
+        typeof n === "number" && isFinite(n) ? `$${n.toLocaleString()}` : "—";
 
-  // ===============================
-  // Calculations
-  // ===============================
-  const totalAllocated = useMemo(
-    () =>
-      Object.values(allocations).reduce((sum, v) => sum + (Number(v) || 0), 0),
-    [allocations],
-  );
-  const remaining = Math.max(0, extraMoney - totalAllocated);
+    const typeLabel = (t) => (t === "saving" ? "Saving" : t === "debt" ? "Debt" : "Goal");
 
-  // ===============================
-  // Handlers
-  // ===============================
+    const iconByType = (t) => {
+        switch (t) {
+            case "goal":
+                return "bi-bullseye";
+            case "debt":
+                return "bi-credit-card";
+            default:
+                return "bi-coin";
+        }
+    };
 
-  // Save all allocations
-  const handleSaveAllAllocations = async () => {
-    try {
-      const updates = [];
+    // ===== Handlers =====
+    const handleSaveAllAllocations = async () => {
+        try {
+            const updates = [];
+            items.forEach((item) => {
+                const addAmount = allocations[item.id] ?? 0;
+                if (!addAmount || addAmount === 0) return;
+                const newBalance = (item.balance ?? 0) + addAmount;
+                updates.push(
+                    updateSavingAsync(item.id, {
+                        source: item.name,
+                        type: item.type,
+                        balance: newBalance,
+                        target: item.target,
+                        year: Number(year),
+                        userId,
+                    })
+                );
+            });
 
-      items.forEach((item) => {
-        const addedAmount = allocations[item.id] ?? 0;
-        if (addedAmount === 0) return;
+            if (updates.length === 0) return;
 
-        const newBalance = (item.balance ?? 0) + addedAmount;
+            setLoading(true);
+            await Promise.all(updates);
+            setAllocations({});
+            await reload(userId, year);
+        } catch (err) {
+            console.error("Failed to save allocations", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        updates.push(
-          updateSavingAsync(item.id, {
-            source: item.name,
-            type: item.type,
-            balance: newBalance,
-            target: item.target,
+    // Add Saving
+    const handleAddSaving = async (e) => {
+        e.preventDefault();
+        if (!mItemName.trim()) return;
+
+        const payload = {
+            source: mItemName.trim(),
+            type: mType,
+            balance: mAmount ? Number(mAmount) : 0,
+            target: mTarget ? Number(mTarget) : null,
             year: Number(year),
             userId,
-          }),
-        );
-      });
+            createdDate: new Date().toISOString(),
+        };
 
-      if (updates.length === 0) return;
-
-      setLoading(true);
-      await Promise.all(updates);
-
-      setAllocations({});
-      await reload(userId, year);
-    } catch (err) {
-      console.error("Failed to save allocations", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Add Saving
-  const handleAddSaving = async (e) => {
-    e.preventDefault();
-
-    if (!mItemName.trim()) return;
-
-    const payload = {
-      source: mItemName.trim(),
-      type: mType,
-      balance: mAmount ? Number(mAmount) : 0,
-      target: mTarget ? Number(mTarget) : null,
-      year: Number(year),
-      userId,
-      createdDate: new Date().toISOString(),
+        try {
+            await addSavingAsync(payload);
+            await reload(userId, year);
+            setShowAddModal(false);
+            setMItemName("");
+            setMType("saving");
+            setMTarget("");
+            setMAmount("");
+        } catch (err) {
+            console.error("Add saving failed", err);
+        }
     };
 
-    try {
-      await addSavingAsync(payload);
-      await reload(userId, year);
-      setShowAddModal(false);
-      setMItemName("");
-      setMType("saving");
-      setMBalance("");
-      setMTarget("");
-      setMAmount("");
-    } catch (err) {
-      console.error("Add saving failed", err);
-    }
-  };
-
-  // Edit
-  const openEdit = (item) => {
-    setEId(item.id);
-    setEItemName(item.name || "");
-    setEType(item.type || "saving");
-    setEAmount(item.balance ?? 0); // <-- set eAmount here
-    setETarget(item.target ?? null);
-    setShowEditModal(true);
-  };
-
-  const handleUpdateSaving = async (ev) => {
-    ev.preventDefault();
-    if (!eId) return;
-
-    const payload = {
-      source: eItemName.trim(),
-      type: eType,
-      balance: eAmount !== "" ? Number(eAmount) : null,
-      target: eTarget !== "" ? Number(eTarget) : null,
-      year: Number(year),
-      userId,
+    // Edit
+    const openEdit = (item) => {
+        setEId(item.id);
+        setEItemName(item.name || "");
+        setEType(item.type || "saving");
+        setEAmount(item.balance ?? 0);
+        setETarget(item.target ?? null);
+        setShowEditModal(true);
     };
 
-    try {
-      await updateSavingAsync(eId, payload);
-      await reload(userId, year);
-      setShowEditModal(false);
-      setEId(null);
-    } catch (err) {
-      console.error("Update failed", err);
+    const handleUpdateSaving = async (ev) => {
+        ev.preventDefault();
+        if (!eId) return;
+
+        const payload = {
+            source: eItemName.trim(),
+            type: eType,
+            balance: eAmount !== "" ? Number(eAmount) : null,
+            target: eTarget !== "" ? Number(eTarget) : null,
+            year: Number(year),
+            userId,
+        };
+
+        try {
+            await updateSavingAsync(eId, payload);
+            await reload(userId, year);
+            setShowEditModal(false);
+            setEId(null);
+        } catch (err) {
+            console.error("Update failed", err);
+        }
+    };
+
+    // Delete
+    const confirmDelete = (item) => {
+        setDeleteItem(item);
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!deleteItem) return;
+        try {
+            setLoading(true);
+            await deleteSavingAsync(deleteItem.id, userId);
+            setShowDeleteModal(false);
+            setDeleteItem(null);
+            await reload(userId, year);
+        } catch (err) {
+            console.error("Delete failed", err);
+            setShowDeleteModal(false);
+            setDeleteItem(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return <div className="container py-4">Loading…</div>;
     }
-  };
 
-  // Delete using modal
-  const confirmDelete = (item) => {
-    setDeleteItem(item);
-    setShowDeleteModal(true);
-  };
+    return (
+        <div className="container mt-4" style={{ margin: "auto" }}>
+            {/* Page header */}
+            <h4 className="page-title">Savings</h4>
+            <div className="page-header-line"></div>
 
-  const handleConfirmDelete = async () => {
-    if (!deleteItem) return;
+            {/* Controls panel: Year + Add Goal */}
+            <div className="panel">
+                <div className="panel-body">
+                    <div className="toolbar">
+                        <div className="mb-0">
+                            <label className="form-label mb-1">Year</label>
+                            <select
+                                className="control-pill"
+                                value={year}
+                                onChange={(e) => setYear(e.target.value)}
+                            >
+                                {[0, -1, -2, -3].map((n) => {
+                                    const y = currentYear + n;
+                                    return (
+                                        <option key={y} value={String(y)}>
+                                            {y}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
 
-    try {
-      setLoading(true);
-      await deleteSavingAsync(deleteItem.id, userId);
-      setShowDeleteModal(false);
-      setDeleteItem(null);
-      await reload(userId, year);
-    } catch (err) {
-      console.error("Delete failed", err);
-      setShowDeleteModal(false);
-      setDeleteItem(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ===============================
-  // Utils
-  // ===============================
-  const currency = (n) =>
-    typeof n === "number" && isFinite(n) ? `$${n.toLocaleString()}` : "—";
-
-  const typeLabel = (t) =>
-    t === "saving" ? "Saving" : t === "debt" ? "Debt" : "Goal";
-
-  // ===============================
-  // Render
-  // ===============================
-  if (loading) return <div className="p-3">Loading…</div>;
-
-  return (
-    <div className="container py-3">
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2>
-          <i className="bi bi-piggy-bank-fill me-2" />
-          Saving
-        </h2>
-        <button
-          className="btn btn-outline-secondary"
-          onClick={() => setShowAddModal(true)}
-        >
-          <i className="bi bi-plus-lg me-1" />
-          Add Item
-        </button>
-      </div>
-
-      {/* Year */}
-      <div className="mb-3">
-        <label className="form-label">Year</label>
-        <select
-          className="form-select"
-          style={{ width: 150 }}
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-        >
-          {[0, -1, -2, -3].map((n) => {
-            const y = currentYear + n;
-            return (
-              <option key={y} value={String(y)}>
-                {y}
-              </option>
-            );
-          })}
-        </select>
-      </div>
-
-      {/* Extra Money */}
-      <div className="mb-3">
-        <span className="badge bg-success fs-6">
-          Extra Money: <strong>${extraMoney}</strong>
-        </span>
-      </div>
-
-      {/* Table */}
-      <div className="table-responsive">
-        <table className="table align-middle">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Type</th>
-              <th className="text-center">Current / Balance</th>
-              <th className="text-center">Left to Reach Target</th>
-              <th className="text-center">Target</th>
-              <th className="text-center">Add Amount ($)</th>
-              <th style={{ width: 120 }} className="text-center">
-                Action
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {items.map((item) => {
-              const value = allocations[item.id] ?? 0;
-              const currentCol = currency(item.balance ?? 0);
-              const targetCol =
-                item.target != null ? currency(item.target) : "—";
-              const remainingToTarget =
-                item.target != null
-                  ? Math.max(0, (item.target ?? 0) - (item.balance ?? 0))
-                  : null;
-
-              return (
-                <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td className="text-start">{typeLabel(item.type)}</td>
-                  <td className="text-center">{currentCol}</td>
-                  <td className="text-center">{remainingToTarget}</td>
-                  <td className="text-center">{targetCol}</td>
-
-                  <td className="text-center" style={{ width: 100 }}>
-                    <input
-                      type="number"
-                      className="form-control form-control-sm text-center inoutAmounts"
-                      value={value}
-                      onChange={(e) =>
-                        setAllocations((prev) => ({
-                          ...prev,
-                          [item.id]: Number(e.target.value) || 0,
-                        }))
-                      }
-                      style={{ maxWidth: 80, margin: "0 auto" }} // small and centered
-                    />
-                  </td>
-
-                  <td className="text-center">
-                    <button
-                      className="btn btn-sm btn-outline-primary me-2"
-                      onClick={() => openEdit(item)}
-                      title="Edit"
-                    >
-                      <i className="bi bi-pencil-square" />
-                    </button>
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => confirmDelete(item)}
-                      title="Delete"
-                    >
-                      <i className="bi bi-trash" />
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      {/* Save Allocations */}
-      <div className="d-flex justify-content-between align-items-center alert alert-warning">
-        <span>
-          {totalAllocated > extraMoney ? (
-            <>You cannot allocate more than your Extra Money (${extraMoney})!</>
-          ) : remaining > 0 ? (
-            <>
-              You still have <strong>${remaining}</strong> unallocated.
-            </>
-          ) : (
-            <>All Extra Money allocated.</>
-          )}
-        </span>
-
-        <button
-          className="btn btn-success"
-          onClick={handleSaveAllAllocations}
-          disabled={totalAllocated === 0 || totalAllocated > extraMoney}
-        >
-          Save All Allocations
-        </button>
-      </div>
-
-      {/* Add Modal */}
-      {showAddModal && (
-        <>
-          <div className="modal fade show" style={{ display: "block" }}>
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <form onSubmit={handleAddSaving}>
-                  <div className="modal-header">
-                    <h5 className="modal-title">Add Item</h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      onClick={() => setShowAddModal(false)}
-                    />
-                  </div>
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label className="form-label">Item Name</label>
-                      <input
-                        className="form-control"
-                        value={mItemName}
-                        onChange={(e) => setMItemName(e.target.value)}
-                        required
-                        placeholder="e.g., TFSA, Europe Trip"
-                      />
+                        <button
+                            className="btn btn-pill btn-green ms-auto"
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                        >
+                            <i className="bi bi-plus-lg"></i>
+                            <span className="ms-1">Add Goal</span>
+                        </button>
                     </div>
-                    <div className="mb-3">
-                      <label className="form-label">Type</label>
-                      <select
-                        className="form-select"
-                        value={mType}
-                        onChange={(e) => setMType(e.target.value)}
-                      >
-                        <option value="saving">Saving</option>
-                        <option value="goal">Goal</option>
-                        <option value="debt">Debt</option>
-                      </select>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Target</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={mTarget}
-                        onChange={(e) => setMTarget(e.target.value)}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Amount</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={mAmount}
-                        onChange={(e) => setMAmount(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={() => setShowAddModal(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" className="btn btn-primary">
-                      Add
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show" />
-        </>
-      )}
-
-      {/* Edit Modal */}
-      {showEditModal && (
-        <>
-          <div className="modal fade show" style={{ display: "block" }}>
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <form onSubmit={handleUpdateSaving}>
-                  <div className="modal-header">
-                    <h5 className="modal-title">Edit Item</h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      onClick={() => setShowEditModal(false)}
-                    />
-                  </div>
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label className="form-label">Item Name</label>
-                      <input
-                        className="form-control"
-                        value={eItemName}
-                        onChange={(e) => setEItemName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Type</label>
-                      <select
-                        className="form-select"
-                        value={eType}
-                        onChange={(e) => setEType(e.target.value)}
-                      >
-                        <option value="saving">Saving</option>
-                        <option value="goal">Goal</option>
-                        <option value="debt">Debt</option>
-                      </select>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Target</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={eTarget}
-                        onChange={(e) => setETarget(e.target.value)}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Balance</label>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={eAmount}
-                        onChange={(e) => setEAmount(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="modal-footer">
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={() => setShowEditModal(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" className="btn btn-primary">
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-          <div className="modal-backdrop fade show" />
-        </>
-      )}
-
-      {/* Delete Modal */}
-      {showDeleteModal && (
-        <>
-          <div className="modal fade show" style={{ display: "block" }}>
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Confirm Delete</h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setShowDeleteModal(false)}
-                  />
                 </div>
-                <div className="modal-body">
-                  Are you sure you want to delete{" "}
-                  <strong>{deleteItem?.name}</strong>? This cannot be undone.
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-light"
-                    onClick={() => setShowDeleteModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={handleConfirmDelete}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
             </div>
-          </div>
-          <div className="modal-backdrop fade show" />
-        </>
-      )}
-    </div>
-  );
+
+            {/* Savings Goals – cards grid */}
+            <div className="panel">
+                <div className="panel-header">
+                    <h6 className="panel-title mb-0">Savings Goals</h6>
+                </div>
+                <div className="panel-body">
+                    <div className="savings-grid">
+                        {items.map((it) => {
+                            const p = percent(it.balance, it.target);
+                            return (
+                                <div key={it.id} className="saving-card">
+                                    <div className="card-top">
+                                        <div className="icon-bubble">
+                                            <i className={`bi ${iconByType(it.type)}`}></i>
+                                        </div>
+                                        <div className="actions">
+                                            <button
+                                                className="action-btn"
+                                                title="Edit"
+                                                onClick={() => openEdit(it)}
+                                            >
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button
+                                                className="action-btn"
+                                                title="Delete"
+                                                onClick={() => confirmDelete(it)}
+                                            >
+                                                <i className="bi bi-trash text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-1">
+                                        <h6 className="title">{it.name}</h6>
+                                    </div>
+
+                                    <div className="mb-2">
+                                        <div className="value">
+                                            {currency(it.balance)}
+                                            {it.target != null && (
+                                                <span className="text-muted fw-normal">
+                                                    {" "}
+                                                    / {currency(it.target)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* progress */}
+                                    {it.target ? (
+                                        <>
+                                            <div className="progress-track mb-1">
+                                                <div
+                                                    className="progress-fill"
+                                                    style={{ width: `${p}%` }}
+                                                />
+                                            </div>
+                                            <small className="muted">{p}% complete</small>
+                                        </>
+                                    ) : (
+                                        <small className="muted">No target set</small>
+                                    )}
+                                </div>
+                            );
+                        })}
+                        {items.length === 0 && (
+                            <div className="text-muted">No items yet. Add your first goal.</div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Extra Allocations */}
+            <div className="panel" id="allocations-table">
+                <div className="panel-header">
+                    <h6 className="panel-title mb-0">Extra Allocations</h6>
+
+                    <div className="d-flex align-items-center gap-2">
+                        <span className="badge-soft success">
+                            Extra Money: <strong className="ms-1">{currency(extraMoney)}</strong>
+                        </span>
+                        <button
+                            type="button"
+                            className="btn btn-pill btn-blue"
+                            onClick={handleSaveAllAllocations}
+                            disabled={totalAllocated === 0 || totalAllocated > extraMoney}
+                            title="Save All Allocations"
+                        >
+                            <i className="bi bi-check2"></i>
+                            <span className="ms-1">Save Allocations</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div className="panel-body">
+                    {/* Remaining / validation */}
+                    <div
+                        className={`alert ${totalAllocated > extraMoney ? "alert-danger" : "alert-warning"
+                            } d-flex justify-content-between align-items-center`}
+                    >
+                        <span>
+                            {totalAllocated > extraMoney ? (
+                                <>You cannot allocate more than your Extra Money ({currency(extraMoney)})!</>
+                            ) : remaining > 0 ? (
+                                <>
+                                    You still have <strong>{currency(remaining)}</strong> unallocated.
+                                </>
+                            ) : (
+                                <>All Extra Money allocated.</>
+                            )}
+                        </span>
+                        <span className="text-muted">
+                            Total Allocated: <strong>{currency(totalAllocated)}</strong>
+                        </span>
+                    </div>
+
+                    {/* Table */}
+                    <div className="table-responsive table-rounded">
+                        <table className="table table-soft table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Savings Type</th>
+                                    <th className="text-center">Current</th>
+                                    <th className="text-center">Target</th>
+                                    <th className="text-center" style={{ width: 140 }}>
+                                        Add Amount ($)
+                                    </th>
+                                    <th className="text-center" style={{ width: 120 }}>
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {items.map((item) => {
+                                    const addVal = allocations[item.id] ?? 0;
+                                    return (
+                                        <tr key={item.id}>
+                                            <td className="fw-semibold d-flex align-items-center gap-2">
+                                                <i className={`bi ${iconByType(item.type)} text-primary`}></i>
+                                                {item.name} <span className="text-muted">({typeLabel(item.type)})</span>
+                                            </td>
+                                            <td className="text-center">{currency(item.balance ?? 0)}</td>
+                                            <td className="text-center">
+                                                {item.target != null ? currency(item.target) : "—"}
+                                            </td>
+                                            <td className="text-center">
+                                                <input
+                                                    type="number"
+                                                    className="form-control form-control-sm text-center"
+                                                    value={addVal}
+                                                    onChange={(e) =>
+                                                        setAllocations((prev) => ({
+                                                            ...prev,
+                                                            [item.id]: Number(e.target.value) || 0,
+                                                        }))
+                                                    }
+                                                    placeholder="0"
+                                                    min="0"
+                                                    style={{ maxWidth: 110, margin: "0 auto" }}
+                                                />
+                                            </td>
+                                            <td className="text-center">
+                                                <button
+                                                    className="btn btn-ghost btn-sm me-2"
+                                                    title="Edit"
+                                                    onClick={() => openEdit(item)}
+                                                >
+                                                    <i className="bi bi-pencil"></i>
+                                                </button>
+                                                <button
+                                                    className="btn btn-ghost btn-sm"
+                                                    title="Delete"
+                                                    onClick={() => confirmDelete(item)}
+                                                >
+                                                    <i className="bi bi-trash text-danger"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                {items.length === 0 && (
+                                    <tr>
+                                        <td colSpan={5} className="text-center py-4 text-muted">
+                                            No allocations available.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {/* ===== Modals ===== */}
+
+            {/* Add Goal */}
+            {showAddModal && (
+                <>
+                    <div className="modal fade show" style={{ display: "block" }}>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <form onSubmit={handleAddSaving}>
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Add Goal</h5>
+                                        <button
+                                            type="button"
+                                            className="btn-close"
+                                            onClick={() => setShowAddModal(false)}
+                                        />
+                                    </div>
+                                    <div className="modal-body">
+                                        <div className="mb-3">
+                                            <label className="form-label">Name</label>
+                                            <input
+                                                className="form-control"
+                                                value={mItemName}
+                                                onChange={(e) => setMItemName(e.target.value)}
+                                                required
+                                                placeholder="e.g., Emergency Fund"
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={mType}
+                                                onChange={(e) => setMType(e.target.value)}
+                                            >
+                                                <option value="saving">Saving</option>
+                                                <option value="goal">Goal</option>
+                                                <option value="debt">Debt</option>
+                                            </select>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Target (optional)</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                value={mTarget}
+                                                onChange={(e) => setMTarget(e.target.value)}
+                                                placeholder="e.g., 10000"
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Initial Amount (optional)</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                value={mAmount}
+                                                onChange={(e) => setMAmount(e.target.value)}
+                                                placeholder="e.g., 500"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-light"
+                                            onClick={() => setShowAddModal(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button type="submit" className="btn btn-primary">
+                                            Add Goal
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show" />
+                </>
+            )}
+
+            {/* Edit Goal */}
+            {showEditModal && (
+                <>
+                    <div className="modal fade show" style={{ display: "block" }}>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <form onSubmit={handleUpdateSaving}>
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Edit Goal</h5>
+                                        <button
+                                            type="button"
+                                            className="btn-close"
+                                            onClick={() => setShowEditModal(false)}
+                                        />
+                                    </div>
+                                    <div className="modal-body">
+                                        <div className="mb-3">
+                                            <label className="form-label">Name</label>
+                                            <input
+                                                className="form-control"
+                                                value={eItemName}
+                                                onChange={(e) => setEItemName(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={eType}
+                                                onChange={(e) => setEType(e.target.value)}
+                                            >
+                                                <option value="saving">Saving</option>
+                                                <option value="goal">Goal</option>
+                                                <option value="debt">Debt</option>
+                                            </select>
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Target (optional)</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                value={eTarget ?? ""}
+                                                onChange={(e) => setETarget(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="form-label">Balance</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                value={eAmount ?? ""}
+                                                onChange={(e) => setEAmount(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button
+                                            type="button"
+                                            className="btn btn-light"
+                                            onClick={() => setShowEditModal(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button type="submit" className="btn btn-primary">
+                                            Save
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show" />
+                </>
+            )}
+
+            {/* Delete */}
+            {showDeleteModal && (
+                <>
+                    <div className="modal fade show" style={{ display: "block" }}>
+                        <div className="modal-dialog">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Confirm Delete</h5>
+                                    <button
+                                        type="button"
+                                        className="btn-close"
+                                        onClick={() => setShowDeleteModal(false)}
+                                    />
+                                </div>
+                                <div className="modal-body">
+                                    Are you sure you want to delete{" "}
+                                    <strong>{deleteItem?.name}</strong>? This cannot be undone.
+                                </div>
+                                <div className="modal-footer">
+                                    <button
+                                        type="button"
+                                        className="btn btn-light"
+                                        onClick={() => setShowDeleteModal(false)}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger"
+                                        onClick={handleConfirmDelete}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show" />
+                </>
+            )}
+        </div>
+    );
 };
 
 export default SavingPage;

@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner, Alert } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
 import {
-    getIncomes,
     getIncomesByMonth,
     addIncome,
     updateIncome,
     deleteIncome,
-    duplicateIncome,
     addSource,
     getSources,
     updateSource,
@@ -15,87 +13,96 @@ import {
     copyIncomesByRange,
 } from "../services/api";
 
+/** Helpers */
+const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+];
+
+const currency = (v) =>
+    new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: "USD", // change to "CAD" if preferred
+        maximumFractionDigits: 2,
+    }).format(Number(v || 0));
+
+const prettyDate = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+};
+
 const IncomePage = () => {
-    const [showModal, setShowModal] = useState(false);
+    // Incomes
     const [incomeList, setIncomeList] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [editingIncome, setEditingIncome] = useState(null);
+
+    // Errors
+    const [error, setError] = useState(null);
+
+    // Income form
+    const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
         owner: "",
         incomeSourceId: "",
         amount: "",
         date: "",
-        frequency: "", // 👈 force choose
-        month: "", // 👈 force choose
+        frequency: "",
+        month: "",
         year: new Date().getFullYear(),
         isRecurring: false,
+        isEstimated: false,
         description: "",
     });
 
-    // Total InCome
-    // const [incomes, setIncomes] = useState([]);
-    // const totalIncome = incomes.reduce((sum, i) => sum + (i.amount || 0), 0);
-    const totalIncome = incomeList.reduce(
-        (sum, i) => sum + (Number(i.amount) || 0),
-        0,
-    );
-
-    // Source modal state
-    const [showSourceModal, setShowSourceModal] = useState(false);
-    const [sourceFormData, setSourceFormData] = useState({
-        id: null,
-        sourceType: "",
-        description: "",
-    });
+    // Sources
     const [sourceList, setSourceList] = useState([]);
     const [loadingSources, setLoadingSources] = useState(false);
+    const [showSourceModal, setShowSourceModal] = useState(false);
+    const [sourceFormData, setSourceFormData] = useState({ id: null, sourceType: "", description: "" });
 
-    const [userId, setUserId] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    // Delete income modal
+    const [showDeleteIncomeModal, setShowDeleteIncomeModal] = useState(false);
+    const [incomeToDelete, setIncomeToDelete] = useState(null);
+
+    // Delete source modal
+    const [showSourceDeleteModal, setShowSourceDeleteModal] = useState(false);
     const [sourceToDelete, setSourceToDelete] = useState(null);
 
-    // Add for loading by year and month
+    // Copy range
+    const [showGenerateModal, setShowGenerateModal] = useState(false);
     const now = new Date();
-
     const [selectedYear, setSelectedYear] = useState(now.getFullYear());
     const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
-
-    // For Generate Next Month
-    const [showGenerateModal, setShowGenerateModal] = useState(false);
     const [generateRange, setGenerateRange] = useState({
-        fromMonth: selectedMonth,
-        fromYear: selectedYear,
-        toMonth: selectedMonth,
-        toYear: selectedYear,
+        fromMonth: selectedMonth, fromYear: selectedYear,
+        toMonth: selectedMonth, toYear: selectedYear,
     });
+    const [sourceMonth, setSourceMonth] = useState(selectedMonth);
+    const [sourceYear, setSourceYear] = useState(selectedYear);
 
+    // Auth
+    const [userId, setUserId] = useState(null);
+
+    const totalIncome = incomeList.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
+    const hasDataToCopy = incomeList.length > 0;
+
+    /** Effects */
     useEffect(() => {
         setGenerateRange({
-            fromMonth: selectedMonth,
-            fromYear: selectedYear,
-            toMonth: selectedMonth,
-            toYear: selectedYear,
+            fromMonth: selectedMonth, fromYear: selectedYear,
+            toMonth: selectedMonth, toYear: selectedYear,
         });
+        setSourceMonth(selectedMonth);
+        setSourceYear(selectedYear);
     }, [selectedMonth, selectedYear]);
 
-    // Decode JWT
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if (!token) {
-            setError("User is not authenticated");
-            return;
-        }
-
+        if (!token) return setError("User is not authenticated");
         try {
             const decoded = jwtDecode(token);
-            const id =
-                decoded[
-                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-                ] ||
-                decoded.sub ||
-                null;
-
+            const id = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub || null;
             if (!id) setError("User is not authenticated");
             else setUserId(id);
         } catch {
@@ -103,69 +110,50 @@ const IncomePage = () => {
         }
     }, []);
 
-    // Fetch incomes
     useEffect(() => {
         if (!userId) return;
-
-        const fetchIncomes = async () => {
+        (async () => {
             setLoading(true);
             try {
-                const now = new Date();
-                const response = await getIncomesByMonth(
-                    userId,
-                    now.getMonth() + 1,
-                    now.getFullYear(),
-                );
-                setIncomeList(response.data);
+                const r = await getIncomesByMonth(userId, selectedMonth, selectedYear);
+                setIncomeList(r.data);
                 setError(null);
             } catch (e) {
-                console.error("Failed to load incomes:", e);
+                console.error(e);
                 setError("Failed to load incomes.");
             } finally {
                 setLoading(false);
             }
-        };
-
-        fetchIncomes();
+        })();
     }, [userId]);
 
     useEffect(() => {
         if (!userId) return;
-
-        const fetchSources = async () => {
+        (async () => {
             setLoadingSources(true);
             try {
-                const response = await getSources(userId);
-                setSourceList(response.data);
-            } catch (err) {
-                console.error("Failed to load sources:", err);
+                const r = await getSources(userId);
+                setSourceList(r.data);
+            } catch (e) {
+                console.error(e);
             } finally {
                 setLoadingSources(false);
             }
-        };
-
-        fetchSources();
+        })();
     }, [userId]);
 
-    // Close Alert Message after 20 secs
     useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => setError(null), 10000);
-            return () => clearTimeout(timer);
-        }
+        if (!error) return;
+        const t = setTimeout(() => setError(null), 10000);
+        return () => clearTimeout(t);
     }, [error]);
 
+    /** Handlers */
     const handleFormChange = (e) => {
         const { name, value, type, checked } = e.target;
-
-        setFormData((prev) => ({
-            ...prev,
-            [name]:
-                type === "checkbox"
-                    ? checked
-                    : name === "month" || name === "year"
-                        ? Number(value)
-                        : value,
+        setFormData((p) => ({
+            ...p,
+            [name]: type === "checkbox" ? checked : (name === "month" || name === "year") ? Number(value) : value,
         }));
     };
 
@@ -176,8 +164,8 @@ const IncomePage = () => {
             incomeSourceId: "",
             amount: "",
             date: "",
-            frequency: "", // ✅ MUST be empty
-            month: "", // ✅ MUST be empty
+            frequency: "",
+            month: "",
             year: new Date().getFullYear(),
             isRecurring: false,
             isEstimated: false,
@@ -192,7 +180,7 @@ const IncomePage = () => {
             id: income.id,
             userId: income.userId,
             owner: income.owner,
-            incomeSourceId: income.incomeSourceId, // ✅ store ID
+            incomeSourceId: income.incomeSourceId,
             amount: income.amount,
             date: income.date.split("T")[0],
             month: income.month,
@@ -214,16 +202,10 @@ const IncomePage = () => {
 
         const month = Number(formData.month);
         const year = Number(formData.year);
+        if (!Number.isInteger(month) || month < 1 || month > 12) return setError("Invalid month selected");
+        if (!Number.isInteger(year) || year < 2000) return setError("Invalid year");
 
-        if (!Number.isInteger(month) || month < 1 || month > 12) {
-            return setError("Invalid month selected");
-        }
-
-        if (!Number.isInteger(year) || year < 2000) {
-            return setError("Invalid year");
-        }
-
-        const incomePayload = {
+        const payload = {
             id: formData.id,
             userId,
             owner: formData.owner || userId,
@@ -232,7 +214,6 @@ const IncomePage = () => {
             date: formData.date,
             month,
             year,
-            // isRecurring: formData.frequency,
             isRecurring: formData.isRecurring,
             isEstimated: formData.isEstimated,
             frequency: formData.frequency,
@@ -243,28 +224,12 @@ const IncomePage = () => {
         };
 
         try {
-            if (editingIncome) {
-                await updateIncome(incomePayload, editingIncome.id);
-            } else {
-                await addIncome(incomePayload);
-            }
-
-            const now = new Date();
-            // const refresh = await getIncomesByMonth(
-            //   userId,
-            //   now.getMonth() + 1,
-            //   now.getFullYear(),
-            // );
+            if (editingIncome) await updateIncome(payload, editingIncome.id);
+            else await addIncome(payload);
 
             setSelectedMonth(formData.month);
             setSelectedYear(formData.year);
-
-            const refresh = await getIncomesByMonth(
-                userId,
-                formData.month,
-                formData.year,
-            );
-
+            const refresh = await getIncomesByMonth(userId, formData.month, formData.year);
             setIncomeList(refresh.data);
             setError(null);
         } catch (err) {
@@ -275,219 +240,33 @@ const IncomePage = () => {
         }
     };
 
-    const handleDeleteIncome = async (id) => {
-        try {
-            await deleteIncome(id);
-            // const response = await getIncomes(userId);
-            const now = new Date();
-            const response = await getIncomesByMonth(
-                userId,
-                now.getMonth() + 1,
-                now.getFullYear(),
-            );
-            setIncomeList(response.data);
-        } catch {
-            setError("Failed to delete income.");
-        }
-    };
-
-    // // Add for next month
-    // const handleGenerateNextMonth = async () => {
-    //   if (!userId) return setError("User is not authenticated");
-
-    //   try {
-    //     setLoading(true);
-    //     const response = await fetch(
-    //       `/api/incomes/generate-next-month/${userId}`,
-    //       { method: "POST" },
-    //     );
-    //     const data = await response.json();
-
-    //     // Refresh current month to include generated incomes if needed
-    //     const now = new Date();
-    //     const refresh = await getIncomesByMonth(
-    //       userId,
-    //       now.getMonth() + 1,
-    //       now.getFullYear(),
-    //     );
-    //     setIncomeList(refresh.data);
-
-    //     setError(null);
-    //   } catch (err) {
-    //     console.error(err);
-    //     setError("Failed to generate next month incomes.");
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-    // const handleDuplicateIncome = async (id) => {
-    //   try {
-    //     await duplicateIncome(id);
-    //     // const response = await getIncomes(userId);
-    //     const now = new Date();
-    //     const response = await getIncomesByMonth(
-    //       userId,
-    //       now.getMonth() + 1,
-    //       now.getFullYear(),
-    //     );
-    //     setIncomeList(response.data);
-    //   } catch {
-    //     setError("Failed to duplicate income.");
-    //   }
-    // };
-
-    // // Logout
-    // const handleLogout = () => {
-    //   localStorage.removeItem("token");
-    //   window.location.href = "/login";
-    // };
-
-    // Source modal handlers
-    const handleShowAddSourceModal = () => {
-        setSourceFormData({ id: null, sourceType: "", description: "" });
-        setShowSourceModal(true);
-    };
-
-    const handleSaveSource = async () => {
-        if (!userId) return setError("User is not authenticated");
-
-        const now = new Date().toISOString();
-        const payload = {
-            Name: sourceFormData.sourceType,
-            Description: sourceFormData.description,
-            UserId: userId,
-            CreatedDate: now,
-            ModifiedDate: now,
-        };
-
-        try {
-            if (sourceFormData.id) {
-                await updateSource(sourceFormData.id, payload);
-            } else {
-                await addSource(payload);
-            }
-
-            const response = await getSources(userId);
-            setSourceList(response.data);
-            setShowSourceModal(false);
-            setSourceFormData({ id: null, sourceType: "", description: "" });
-
-            // ✅ Update incomeList with new source names
-            setIncomeList((prev) =>
-                prev.map((income) => ({
-                    ...income,
-                    sourceType:
-                        response.data.find((s) => s.id === income.incomeSourceId)?.name ||
-                        income.sourceType,
-                })),
-            );
-
-            setError(null);
-        } catch (err) {
-            console.error("Failed to save source:", err);
-            setError("Failed to save source.");
-        }
-    };
-
-    const handleEditSource = (source) => {
-        setSourceFormData({
-            id: source.id,
-            sourceType: source.name,
-            description: source.description,
-        });
-        setShowSourceModal(true);
-    };
-
-    const confirmDeleteSource = (source) => {
-        setSourceToDelete(source);
-        setShowDeleteModal(true);
-    };
-
-    const handleDeleteConfirmed = async () => {
-        if (!sourceToDelete) return;
-
-        try {
-            const success = await deleteSource(sourceToDelete.id);
-            if (success) {
-                setSourceList((prev) => prev.filter((s) => s.id !== sourceToDelete.id));
-            }
-        } catch (error) {
-            console.error("Delete failed:", error);
-        } finally {
-            setShowDeleteModal(false);
-            setSourceToDelete(null);
-        }
-    };
-
-    // Search by year and month
     const handleSearchByMonth = async () => {
         if (!userId) return setError("User is not authenticated");
-
         try {
             setLoading(true);
-            const response = await getIncomesByMonth(
-                userId,
-                selectedMonth,
-                selectedYear,
-            );
-            setIncomeList(response.data);
+            const r = await getIncomesByMonth(userId, selectedMonth, selectedYear);
+            setIncomeList(r.data);
             setError(null);
-        } catch (err) {
-            console.error(err);
+        } catch (e) {
+            console.error(e);
             setError("Failed to load incomes.");
         } finally {
             setLoading(false);
         }
     };
 
-    const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-
-    const hasDataToCopy = incomeList.length > 0;
-
-    const buildGeneratePayload = () => ({
-        userId,
-        sourceYear: selectedYear,
-        sourceMonth: selectedMonth,
-        targetFromYear: generateRange.fromYear,
-        targetFromMonth: generateRange.fromMonth,
-        targetToYear: generateRange.toYear,
-        targetToMonth: generateRange.toMonth,
-    });
-
-    const [sourceMonth, setSourceMonth] = useState(selectedMonth);
-    const [sourceYear, setSourceYear] = useState(selectedYear);
-
-    // Delete Modal
-    const [showDeleteIncomeModal, setShowDeleteIncomeModal] = useState(false);
-    const [incomeToDelete, setIncomeToDelete] = useState(null);
-
+    // Income delete
     const confirmDeleteIncome = (income) => {
         setIncomeToDelete(income);
         setShowDeleteIncomeModal(true);
     };
-
     const handleDeleteIncomeConfirmed = async () => {
         if (!incomeToDelete) return;
-
         try {
             await deleteIncome(incomeToDelete.id);
             setIncomeList((prev) => prev.filter((i) => i.id !== incomeToDelete.id));
-        } catch (err) {
-            console.error("Failed to delete income:", err);
+        } catch (e) {
+            console.error(e);
             setError("Failed to delete income.");
         } finally {
             setShowDeleteIncomeModal(false);
@@ -495,266 +274,301 @@ const IncomePage = () => {
         }
     };
 
+    // Source CRUD
+    const handleShowAddSourceModal = () => {
+        setSourceFormData({ id: null, sourceType: "", description: "" });
+        setShowSourceModal(true);
+    };
+
+    const handleSaveSource = async () => {
+        if (!userId) return setError("User is not authenticated");
+        const nowISO = new Date().toISOString();
+        const payload = {
+            Name: sourceFormData.sourceType,
+            Description: sourceFormData.description,
+            UserId: userId,
+            CreatedDate: nowISO,
+            ModifiedDate: nowISO,
+        };
+        try {
+            if (sourceFormData.id) await updateSource(sourceFormData.id, payload);
+            else await addSource(payload);
+
+            const r = await getSources(userId);
+            setSourceList(r.data);
+            setShowSourceModal(false);
+            setSourceFormData({ id: null, sourceType: "", description: "" });
+
+            // keep table labels in sync
+            setIncomeList((prev) =>
+                prev.map((income) => ({
+                    ...income,
+                    sourceType:
+                        r.data.find((s) => s.id === income.incomeSourceId)?.name ||
+                        income.sourceType,
+                }))
+            );
+        } catch (e) {
+            console.error(e);
+            setError("Failed to save source.");
+        }
+    };
+
+    const handleEditSource = (source) => {
+        setSourceFormData({ id: source.id, sourceType: source.name, description: source.description });
+        setShowSourceModal(true);
+    };
+
+    const confirmDeleteSource = (source) => {
+        setSourceToDelete(source);
+        setShowSourceDeleteModal(true);
+    };
+
+    const handleDeleteConfirmed = async () => {
+        if (!sourceToDelete) return;
+        try {
+            const success = await deleteSource(sourceToDelete.id);
+            if (success) {
+                setSourceList((prev) => prev.filter((s) => s.id !== sourceToDelete.id));
+            }
+        } catch (e) {
+            console.error("Delete failed:", e);
+        } finally {
+            setShowSourceDeleteModal(false);
+            setSourceToDelete(null);
+        }
+    };
+
+    /** Render */
     return (
         <div className="container mt-4" style={{ margin: "auto" }}>
-            <div className="d-flex justify-content-between align-items-end mb-3">
-                <div className="d-flex gap-3 mb-3 align-items-end">
-                    {/* Month */}
-                    <Form.Group className="mb-0">
-                        <Form.Label className="mb-1">Month</Form.Label>
-                        <Form.Select
-                            value={selectedMonth}
-                            onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                        >
-                            {[
-                                "January",
-                                "February",
-                                "March",
-                                "April",
-                                "May",
-                                "June",
-                                "July",
-                                "August",
-                                "September",
-                                "October",
-                                "November",
-                                "December",
-                            ].map((m, index) => (
-                                <option key={index + 1} value={index + 1}>
-                                    {m}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
+            {/* Page header with very light underline */}
+            <h4 className="page-title">Income</h4>
+            <div className="page-header-line"></div>
 
-                    {/* Year */}
-                    <Form.Group className="mb-0">
-                        <Form.Label className="mb-1">Year</Form.Label>
-                        <Form.Select
-                            value={selectedYear}
-                            onChange={(e) => setSelectedYear(Number(e.target.value))}
-                        >
-                            {[...Array(5)].map((_, i) => {
-                                const year = now.getFullYear() - i;
-                                return (
-                                    <option key={year} value={year}>
-                                        {year}
-                                    </option>
-                                );
-                            })}
-                        </Form.Select>
-                    </Form.Group>
+            {/* Filter toolbar */}
+            <div className="panel">
+                <div className="panel-body">
+                    <div className="toolbar">
+                        <Form.Group className="mb-0">
+                            <Form.Label className="form-label mb-1">Month</Form.Label>
+                            <Form.Select
+                                className="control-pill"
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                            >
+                                {monthNames.map((m, i) => (
+                                    <option key={i} value={i + 1}>{m}</option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
 
-                    {/* Search Button */}
-                    <Button variant="primary" onClick={handleSearchByMonth}>
-                        <i className="bi bi-search me-1"></i> Search
-                    </Button>
+                        <Form.Group className="mb-0">
+                            <Form.Label className="form-label mb-1">Year</Form.Label>
+                            <Form.Select
+                                className="control-pill"
+                                value={selectedYear}
+                                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                            >
+                                {[...Array(5)].map((_, i) => {
+                                    const y = now.getFullYear() - i;
+                                    return <option key={y} value={y}>{y}</option>;
+                                })}
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Button className="btn-pill btn-green" onClick={handleSearchByMonth}>
+                            <i className="bi bi-search"></i>
+                            <span className="ms-1">Search</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
 
             {error && (
-                <Alert
-                    variant="danger"
-                    dismissible
-                    onClose={() => setError(null)}
-                    style={{ border: "2px solid black" }}
-                >
+                <Alert variant="danger" dismissible onClose={() => setError(null)}>
                     {error}
                 </Alert>
             )}
-            {/* Delete Source Modal */}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Delete</Modal.Title>
-                </Modal.Header>
+
+            {/* Income Sources */}
+            <div className="panel mb-3">
+                <div className="panel-header">
+                    <h6 className="panel-title mb-0">Income Sources</h6>
+                    <Button className="btn-pill btn-green" onClick={handleShowAddSourceModal}>
+                        <i className="bi bi-plus-lg"></i>
+                        <span className="ms-1">Add Source</span>
+                    </Button>
+                </div>
+                <div className="panel-body">
+                    {loadingSources ? (
+                        <Spinner animation="border" />
+                    ) : (
+                        <div className="table-responsive table-rounded">
+                            <table className="table table-soft table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Description</th>
+                                        <th style={{ width: 120 }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sourceList.length === 0 ? (
+                                        <tr><td colSpan="3" className="text-center py-4">No sources found</td></tr>
+                                    ) : (
+                                        sourceList.map((s) => (
+                                            <tr key={s.id}>
+                                                <td className="fw-semibold d-flex align-items-center gap-2">
+                                                    <i className="bi bi-check2-square text-success"></i>
+                                                    {s.name}
+                                                </td>
+                                                <td className="text-muted">{s.description}</td>
+                                                <td>
+                                                    <Button size="sm" className="btn-ghost me-2" onClick={() => handleEditSource(s)}>
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+                                                    <Button size="sm" className="btn-ghost" onClick={() => confirmDeleteSource(s)}>
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Income Records */}
+            <div className="panel">
+                <div className="panel-header">
+                    <h6 className="panel-title mb-0">Income Records</h6>
+                    <div className="d-flex gap-2">
+                        <Button className="btn-pill btn-blue" onClick={() => setShowGenerateModal(true)}>
+                            <i className="bi bi-calendar-range"></i>
+                            <span className="ms-1">Copy Incomes to Next Month</span>
+                        </Button>
+                        <Button className="btn-pill btn-green" onClick={handleShowAddModal}>
+                            <i className="bi bi-plus-lg"></i>
+                            <span className="ms-1">Add Income</span>
+                        </Button>
+                    </div>
+                </div>
+                <div className="panel-body">
+                    {loading ? (
+                        <Spinner animation="border" />
+                    ) : (
+                        <div className="table-responsive table-rounded">
+                            <table className="table table-soft table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Note</th>
+                                        <th style={{ width: 120 }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {incomeList.length === 0 ? (
+                                        <tr><td colSpan="5" className="text-center py-4">No incomes found</td></tr>
+                                    ) : (
+                                        incomeList.map((i) => (
+                                            <tr key={i.id}>
+                                                <td className="fw-semibold d-flex align-items-center gap-2">
+                                                    {i.isRecurring && <span className="badge-soft success">Monthly</span>}
+                                                    {i.sourceType}
+                                                </td>
+                                                <td className="fw-bold text-success">{currency(i.amount)}</td>
+                                                <td>{prettyDate(i.date)}</td>
+                                                <td className="text-muted">{i.description}</td>
+                                                <td>
+                                                    <Button size="sm" className="btn-ghost me-2" onClick={() => handleShowEditModal(i)}>
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+                                                    <Button size="sm" className="btn-ghost" onClick={() => confirmDeleteIncome(i)}>
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                                {incomeList.length > 0 && (
+                                    <tfoot>
+                                        <tr>
+                                            <td className="text-end fw-bold">Total:</td>
+                                            <td className="fw-bold text-success">{currency(totalIncome)}</td>
+                                            <td colSpan="3"></td>
+                                        </tr>
+                                    </tfoot>
+                                )}
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* ===== Modals ===== */}
+
+            {/* Delete Source */}
+            <Modal show={showSourceDeleteModal} onHide={() => setShowSourceDeleteModal(false)}>
+                <Modal.Header closeButton><Modal.Title>Confirm Delete</Modal.Title></Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete the source "
-                    {sourceToDelete?.Name || sourceToDelete?.name}"?
+                    Are you sure you want to delete the source "{sourceToDelete?.Name || sourceToDelete?.name}"?
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="danger" onClick={handleDeleteConfirmed}>
-                        Delete
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowSourceDeleteModal(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDeleteConfirmed}>Delete</Button>
                 </Modal.Footer>
             </Modal>
 
-            {/* Income Sources Section */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mt-4">Income Sources</h5>
-                <Button className="me-2" onClick={handleShowAddSourceModal}>
-                    <i className="bi bi-plus-circle me-2"></i> Add Source
-                </Button>
-            </div>
+            {/* Add/Edit Source */}
+            <Modal show={showSourceModal} onHide={() => setShowSourceModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{sourceFormData.id ? "Edit Source" : "Add Source"}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Source Type</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={sourceFormData.sourceType}
+                                onChange={(e) => setSourceFormData((p) => ({ ...p, sourceType: e.target.value }))}
+                            />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={sourceFormData.description}
+                                onChange={(e) => setSourceFormData((p) => ({ ...p, description: e.target.value }))}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowSourceModal(false)}>Cancel</Button>
+                    <Button variant="primary" onClick={handleSaveSource}>Save</Button>
+                </Modal.Footer>
+            </Modal>
 
-            {/* //#region Source Type */}
-            {loadingSources ? (
-                <Spinner animation="border" />
-            ) : (
-                <div className="table-responsive">
-                    <table className="table table-striped table-hover align-middle">
-                        <thead className="table-dark">
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th style={{ width: "120px" }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sourceList.length === 0 ? (
-                                <tr>
-                                    <td colSpan="3" className="text-center">
-                                        No sources found
-                                    </td>
-                                </tr>
-                            ) : (
-                                sourceList.map((source) => (
-                                    <tr key={source.id}>
-                                        <td>{source.name}</td>
-                                        <td>{source.description}</td>
-                                        <td>
-                                            <Button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                className="me-2"
-                                                onClick={() => handleEditSource(source)}
-                                            >
-                                                <i className="bi bi-pencil"></i>
-                                            </Button>
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => confirmDeleteSource(source)}
-                                            >
-                                                <i className="bi bi-trash"></i>
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            )}
-
-            {/* region Income Section*/}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mt-4">Incomes</h5>
-                <div className="d-flex gap-2">
-                    <Button onClick={handleShowAddModal}>
-                        <i className="bi bi-plus-circle"></i> Add Income
-                    </Button>
-                    {/* <Button variant="outline-success" onClick={handleGenerateNextMonth}>
-            <i className="bi bi-calendar-plus"></i> Generate Next Month
-          </Button> */}
-                    <Button
-                        variant="outline-success"
-                        onClick={() => setShowGenerateModal(true)}
-                    >
-                        <i className="bi bi-calendar-range"></i> Copy Incomes to Next Month
-                    </Button>
-                </div>
-            </div>
-
-            {loading ? (
-                <Spinner animation="border" />
-            ) : (
-                <div className="table-responsive">
-                    <table className="table table-striped table-hover">
-                        <thead className="table-dark">
-                            <tr>
-                                <th>Date</th>
-                                <th>Owner</th>
-                                <th>Source</th>
-                                <th>Amount</th>
-                                <th>Recurring</th>
-                                <th>Year</th>
-                                <th>Month</th>
-                                <th>Frequency</th>
-                                <th>Description</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {incomeList.length === 0 ? (
-                                <tr>
-                                    <td colSpan="10" className="text-center">
-                                        No incomes found
-                                    </td>
-                                </tr>
-                            ) : (
-                                incomeList.map((income) => (
-                                    <tr key={income.id}>
-                                        <td>{new Date(income.date).toLocaleDateString()}</td>
-                                        <td>{income.owner}</td>
-                                        <td>{income.sourceType}</td>
-                                        <td>${income.amount.toFixed(2)}</td>
-                                        <td>{income.isRecurring ? "Yes" : "No"}</td>
-                                        <td>{income.year}</td>
-                                        <td>{income.month}</td>
-                                        <td>{income.frequency}</td>
-                                        <td>{income.description}</td>
-                                        <td>
-                                            <Button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                className="me-2"
-                                                onClick={() => handleShowEditModal(income)}
-                                            >
-                                                <i className="bi bi-pencil" title="Edit Income"></i>
-                                            </Button>
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => confirmDeleteIncome(income)}
-                                            >
-                                                <i className="bi bi-trash" title="Delete Income"></i>
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-
-                        {/* ✅ Total row */}
-                        {incomeList.length > 0 && (
-                            <tfoot className="table-light">
-                                <tr>
-                                    <td colSpan="3" className="fw-bold text-end">
-                                        Total Income:
-                                    </td>
-                                    <td className="fw-bold text-success fs-5">
-                                        ${totalIncome.toFixed(2)}
-                                    </td>
-                                    <td colSpan="6"></td>
-                                </tr>
-                            </tfoot>
-                        )}
-                    </table>
-                </div>
-            )}
-
-            {/* Income Add/Edit Modal */}
+            {/* Add/Edit Income */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Form onSubmit={handleSaveIncome}>
                     <Modal.Header closeButton>
-                        <Modal.Title>
-                            {editingIncome ? "Edit Income" : "Add New Income"}
-                        </Modal.Title>
+                        <Modal.Title>{editingIncome ? "Edit Income" : "Add New Income"}</Modal.Title>
                     </Modal.Header>
-
                     <Modal.Body>
                         <Form.Group className="mb-3">
                             <Form.Label>Owner</Form.Label>
-                            <Form.Control
-                                name="owner"
-                                value={formData.owner}
-                                onChange={handleFormChange}
-                                required
-                            />
+                            <Form.Control name="owner" value={formData.owner} onChange={handleFormChange} required />
                         </Form.Group>
+
                         <Form.Group className="mb-3">
                             <Form.Label>Source Type</Form.Label>
                             <Form.Select
@@ -764,46 +578,27 @@ const IncomePage = () => {
                                 required
                             >
                                 <option value="">Choose source</option>
-                                {sourceList.map((source) => (
-                                    <option key={source.id} value={source.id}>
-                                        {source.name}
-                                    </option>
+                                {sourceList.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
+
                         <Form.Group className="mb-3">
                             <Form.Label>Amount</Form.Label>
                             <Form.Control
-                                name="amount"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                value={formData.amount}
-                                onChange={handleFormChange}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Date</Form.Label>
-                            <Form.Control
-                                name="date"
-                                type="date"
-                                value={formData.date}
-                                onChange={handleFormChange}
-                                required
+                                name="amount" type="number" step="0.01" min="0"
+                                value={formData.amount} onChange={handleFormChange} required
                             />
                         </Form.Group>
 
-                        <Form.Select
-                            className="mb-3"
-                            name="frequency"
-                            value={formData.frequency}
-                            onChange={handleFormChange}
-                            required
-                        >
-                            <option value="" disabled>
-                                Choose recurrence
-                            </option>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Date</Form.Label>
+                            <Form.Control name="date" type="date" value={formData.date} onChange={handleFormChange} required />
+                        </Form.Group>
+
+                        <Form.Select className="mb-3" name="frequency" value={formData.frequency} onChange={handleFormChange} required>
+                            <option value="" disabled>Choose recurrence</option>
                             <option value="None">One-time</option>
                             <option value="Weekly">Weekly</option>
                             <option value="ByWeekly">By Weekly</option>
@@ -811,145 +606,39 @@ const IncomePage = () => {
                             <option value="Yearly">Yearly</option>
                         </Form.Select>
 
-                        {/* Month */}
                         <Form.Group className="mb-3">
                             <Form.Label>Month</Form.Label>
-                            <Form.Select
-                                name="month"
-                                value={formData.month}
-                                onChange={handleFormChange}
-                                required
-                            >
+                            <Form.Select name="month" value={formData.month} onChange={handleFormChange} required>
                                 <option value="">Choose month</option>
-                                {[
-                                    "January",
-                                    "February",
-                                    "March",
-                                    "April",
-                                    "May",
-                                    "June",
-                                    "July",
-                                    "August",
-                                    "September",
-                                    "October",
-                                    "November",
-                                    "December",
-                                ].map((m, i) => (
-                                    <option key={i + 1} value={i + 1}>
-                                        {m}
-                                    </option>
-                                ))}
+                                {monthNames.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
                             </Form.Select>
                         </Form.Group>
 
-                        {/* Year */}
                         <Form.Group className="mb-3">
                             <Form.Label>Year</Form.Label>
-                            <Form.Control
-                                name="year"
-                                type="number"
-                                min="2000"
-                                value={formData.year}
-                                onChange={handleFormChange}
-                                required
-                            />
+                            <Form.Control name="year" type="number" min="2000" value={formData.year} onChange={handleFormChange} required />
                         </Form.Group>
 
-                        {/* Recurring checkbox (optional visual indicator) */}
                         <Form.Group className="mb-3">
-                            <Form.Check
-                                type="checkbox"
-                                label="Is Recurring?"
-                                name="isRecurring"
-                                checked={formData.isRecurring}
-                                onChange={handleFormChange}
-                            />
+                            <Form.Check type="checkbox" label="Is Recurring?" name="isRecurring" checked={formData.isRecurring} onChange={handleFormChange} />
                         </Form.Group>
 
-                        {/* Description */}
                         <Form.Group className="mb-3">
                             <Form.Label>Description</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={2}
-                                name="description"
-                                value={formData.description}
-                                onChange={handleFormChange}
-                            />
+                            <Form.Control as="textarea" rows={2} name="description" value={formData.description} onChange={handleFormChange} />
                         </Form.Group>
                     </Modal.Body>
-
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setShowModal(false)}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" variant="primary">
-                            {editingIncome ? "Save Changes" : "Add Income"}
-                        </Button>
+                        <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+                        <Button type="submit" variant="primary">{editingIncome ? "Save Changes" : "Add Income"}</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>
 
-            {/* Add/Edit Source Modal */}
-            <Modal show={showSourceModal} onHide={() => setShowSourceModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>
-                        {sourceFormData.id ? "Edit Source" : "Add Source"}
-                    </Modal.Title>
-                </Modal.Header>
+            {/* Copy incomes */}
+            <Modal show={showGenerateModal} onHide={() => setShowGenerateModal(false)} centered>
+                <Modal.Header closeButton><Modal.Title>Copy Incomes</Modal.Title></Modal.Header>
                 <Modal.Body>
-                    <Form>
-                        <Form.Group>
-                            <Form.Label>Source Type</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={sourceFormData.sourceType}
-                                onChange={(e) =>
-                                    setSourceFormData({
-                                        ...sourceFormData,
-                                        sourceType: e.target.value,
-                                    })
-                                }
-                            />
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={sourceFormData.description}
-                                onChange={(e) =>
-                                    setSourceFormData({
-                                        ...sourceFormData,
-                                        description: e.target.value,
-                                    })
-                                }
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowSourceModal(false)}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={handleSaveSource}>
-                        Save
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-
-            {/* modal for nex month */}
-
-            <Modal
-                show={showGenerateModal}
-                onHide={() => setShowGenerateModal(false)}
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Copy Incomes</Modal.Title>
-                </Modal.Header>
-
-                <Modal.Body>
-                    {/* SOURCE MONTH & YEAR */}
                     <Form.Group className="mb-3">
                         <Form.Label className="fw-semibold">Source Month & Year</Form.Label>
                         <div className="d-flex gap-2">
@@ -958,81 +647,44 @@ const IncomePage = () => {
                                 onChange={(e) => {
                                     const val = Number(e.target.value);
                                     setSourceMonth(val);
-
-                                    setGenerateRange((p) => ({
-                                        ...p,
-                                        fromMonth: Math.max(val, p.fromMonth),
-                                        toMonth: Math.max(val, p.toMonth),
-                                    }));
+                                    setGenerateRange((p) => ({ ...p, fromMonth: Math.max(val, p.fromMonth), toMonth: Math.max(val, p.toMonth) }));
                                 }}
                             >
-                                {monthNames.map((m, i) => (
-                                    <option key={i + 1} value={i + 1}>
-                                        {m}
-                                    </option>
-                                ))}
+                                {monthNames.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
                             </Form.Select>
-
-                            <Form.Control
-                                type="number"
-                                value={sourceYear}
-                                onChange={(e) => setSourceYear(Number(e.target.value))}
-                            />
+                            <Form.Control type="number" value={sourceYear} onChange={(e) => setSourceYear(Number(e.target.value))} />
                         </div>
                     </Form.Group>
 
-                    {!hasDataToCopy && (
+                    {!hasDataToCopy ? (
                         <Alert variant="warning" className="mb-0">
-                            <i className="bi bi-exclamation-triangle me-2"></i>
-                            There are no incomes in this month to copy.
+                            <i className="bi bi-exclamation-triangle me-2"></i> There are no incomes in this month to copy.
                         </Alert>
-                    )}
-
-                    {hasDataToCopy && (
+                    ) : (
                         <Form.Group className="mb-3">
                             <Form.Label className="fw-semibold">Copy to Months</Form.Label>
-
                             <div className="d-flex gap-2 align-items-center">
                                 <Form.Label className="mb-0">From</Form.Label>
                                 <Form.Select
                                     value={generateRange.fromMonth}
                                     onChange={(e) => {
                                         const val = Number(e.target.value);
-                                        setGenerateRange((p) => ({
-                                            ...p,
-                                            fromMonth: val,
-                                            toMonth: Math.max(val, p.toMonth),
-                                        }));
+                                        setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
                                     }}
                                 >
-                                    {monthNames
-                                        .map((m, i) => ({ label: m, value: i + 1 }))
+                                    {monthNames.map((m, i) => ({ label: m, value: i + 1 }))
                                         .filter((m) => m.value >= sourceMonth)
-                                        .map((m) => (
-                                            <option key={m.value} value={m.value}>
-                                                {m.label}
-                                            </option>
-                                        ))}
+                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
                                 </Form.Select>
 
                                 <Form.Label className="mb-0">To</Form.Label>
                                 <Form.Select
                                     value={generateRange.toMonth}
-                                    onChange={(e) =>
-                                        setGenerateRange((p) => ({
-                                            ...p,
-                                            toMonth: Number(e.target.value),
-                                        }))
-                                    }
+                                    onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
                                 >
-                                    {monthNames
-                                        .map((m, i) => ({ label: m, value: i + 1 }))
+                                    {monthNames.map((m, i) => ({ label: m, value: i + 1 }))
                                         .filter((m) => m.value >= generateRange.fromMonth)
-                                        .map((m) => (
-                                            <option key={m.value} value={m.value}>
-                                                {m.label}
-                                            </option>
-                                        ))}
+                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
                                 </Form.Select>
                             </div>
 
@@ -1043,18 +695,9 @@ const IncomePage = () => {
                         </Form.Group>
                     )}
                 </Modal.Body>
-
                 <Modal.Footer>
-                    <Button
-                        variant="secondary"
-                        onClick={() => setShowGenerateModal(false)}
-                    >
-                        Cancel
-                    </Button>
-
-                    <Button
-                        variant="success"
-                        disabled={!hasDataToCopy}
+                    <Button variant="secondary" onClick={() => setShowGenerateModal(false)}>Cancel</Button>
+                    <Button className="btn-pill btn-blue" disabled={!hasDataToCopy}
                         onClick={async () => {
                             const payload = {
                                 UserId: userId,
@@ -1065,7 +708,6 @@ const IncomePage = () => {
                                 TargetToMonth: generateRange.toMonth,
                                 TargetToYear: sourceYear,
                             };
-
                             await copyIncomesByRange(payload);
                             setShowGenerateModal(false);
                         }}
@@ -1075,31 +717,16 @@ const IncomePage = () => {
                 </Modal.Footer>
             </Modal>
 
-            {/* Delete Modal */}
-            <Modal
-                show={showDeleteIncomeModal}
-                onHide={() => setShowDeleteIncomeModal(false)}
-                centered
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirm Delete</Modal.Title>
-                </Modal.Header>
+            {/* Delete Income */}
+            <Modal show={showDeleteIncomeModal} onHide={() => setShowDeleteIncomeModal(false)} centered>
+                <Modal.Header closeButton><Modal.Title>Confirm Delete</Modal.Title></Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete the income from "
-                    {incomeToDelete?.sourceType}" on{" "}
-                    {incomeToDelete && new Date(incomeToDelete.date).toLocaleDateString()}
-                    ?
+                    Are you sure you want to delete the income from "{incomeToDelete?.sourceType}" on{" "}
+                    {incomeToDelete && prettyDate(incomeToDelete.date)}?
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button
-                        variant="secondary"
-                        onClick={() => setShowDeleteIncomeModal(false)}
-                    >
-                        Cancel
-                    </Button>
-                    <Button variant="danger" onClick={handleDeleteIncomeConfirmed}>
-                        Delete
-                    </Button>
+                    <Button variant="secondary" onClick={() => setShowDeleteIncomeModal(false)}>Cancel</Button>
+                    <Button variant="danger" onClick={handleDeleteIncomeConfirmed}>Delete</Button>
                 </Modal.Footer>
             </Modal>
         </div>

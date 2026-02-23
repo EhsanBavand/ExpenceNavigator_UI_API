@@ -38,6 +38,7 @@ export default defineConfig({
         }
     },
     server: {
+        open: true,
         proxy: {
             '/api': {
                 target: target,
