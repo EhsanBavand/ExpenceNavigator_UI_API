@@ -223,16 +223,17 @@ const SavingPage = () => {
     }
 
     return (
+
         <div className="container mt-4" style={{ margin: "auto" }}>
             {/* Page header */}
             <h4 className="page-title">Savings</h4>
             <div className="page-header-line"></div>
 
-            {/* Controls panel: Year + Add Goal */}
+            {/* Filter year + Add Goal */}
             <div className="panel">
                 <div className="panel-body">
-                    <div className="toolbar">
-                        <div className="mb-0">
+                    <div className="toolbar stack-sm">
+                        <div className="mb-0 w-100-sm">
                             <label className="form-label mb-1">Year</label>
                             <select
                                 className="control-pill"
@@ -251,7 +252,7 @@ const SavingPage = () => {
                         </div>
 
                         <button
-                            className="btn btn-pill btn-green ms-auto"
+                            className="btn btn-pill btn-green full-btn-sm ms-md-auto"
                             onClick={() => setShowAddModal(true)}
                             type="button"
                         >
@@ -262,11 +263,12 @@ const SavingPage = () => {
                 </div>
             </div>
 
-            {/* Savings Goals – cards grid */}
+            {/* Savings Goals Grid */}
             <div className="panel">
                 <div className="panel-header">
                     <h6 className="panel-title mb-0">Savings Goals</h6>
                 </div>
+
                 <div className="panel-body">
                     <div className="savings-grid">
                         {items.map((it) => {
@@ -277,48 +279,30 @@ const SavingPage = () => {
                                         <div className="icon-bubble">
                                             <i className={`bi ${iconByType(it.type)}`}></i>
                                         </div>
+
                                         <div className="actions">
-                                            <button
-                                                className="action-btn"
-                                                title="Edit"
-                                                onClick={() => openEdit(it)}
-                                            >
+                                            <button className="action-btn" title="Edit" onClick={() => openEdit(it)}>
                                                 <i className="bi bi-pencil"></i>
                                             </button>
-                                            <button
-                                                className="action-btn"
-                                                title="Delete"
-                                                onClick={() => confirmDelete(it)}
-                                            >
+                                            <button className="action-btn" title="Delete" onClick={() => confirmDelete(it)}>
                                                 <i className="bi bi-trash text-danger"></i>
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div className="mb-1">
-                                        <h6 className="title">{it.name}</h6>
+                                    <h6 className="title mb-1">{it.name}</h6>
+
+                                    <div className="value mb-2">
+                                        {currency(it.balance)}
+                                        {it.target != null && (
+                                            <span className="text-muted fw-normal"> / {currency(it.target)}</span>
+                                        )}
                                     </div>
 
-                                    <div className="mb-2">
-                                        <div className="value">
-                                            {currency(it.balance)}
-                                            {it.target != null && (
-                                                <span className="text-muted fw-normal">
-                                                    {" "}
-                                                    / {currency(it.target)}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* progress */}
                                     {it.target ? (
                                         <>
                                             <div className="progress-track mb-1">
-                                                <div
-                                                    className="progress-fill"
-                                                    style={{ width: `${p}%` }}
-                                                />
+                                                <div className="progress-fill" style={{ width: `${p}%` }} />
                                             </div>
                                             <small className="muted">{p}% complete</small>
                                         </>
@@ -328,6 +312,7 @@ const SavingPage = () => {
                                 </div>
                             );
                         })}
+
                         {items.length === 0 && (
                             <div className="text-muted">No items yet. Add your first goal.</div>
                         )}
@@ -335,21 +320,24 @@ const SavingPage = () => {
                 </div>
             </div>
 
-            {/* Extra Allocations */}
+            {/* ================================
+        Extra Allocations (Responsive)
+       ================================ */}
             <div className="panel" id="allocations-table">
                 <div className="panel-header">
                     <h6 className="panel-title mb-0">Extra Allocations</h6>
 
-                    <div className="d-flex align-items-center gap-2">
-                        <span className="badge-soft success">
+                    {/* Save button row (responsive) */}
+                    <div className="d-flex gap-2 stack-sm">
+                        <span className="badge-soft success w-100-sm text-center py-2 fs-6">
                             Extra Money: <strong className="ms-1">{currency(extraMoney)}</strong>
                         </span>
+
                         <button
                             type="button"
-                            className="btn btn-pill btn-blue"
-                            onClick={handleSaveAllAllocations}
+                            className="btn btn-pill btn-blue full-btn-sm"
                             disabled={totalAllocated === 0 || totalAllocated > extraMoney}
-                            title="Save All Allocations"
+                            onClick={handleSaveAllAllocations}
                         >
                             <i className="bi bi-check2"></i>
                             <span className="ms-1">Save Allocations</span>
@@ -358,36 +346,35 @@ const SavingPage = () => {
                 </div>
 
                 <div className="panel-body">
-                    {/* Remaining / validation */}
+                    {/* remaining notice */}
                     <div
-                        className={`alert ${totalAllocated > extraMoney ? "alert-danger" : "alert-warning"
-                            } d-flex justify-content-between align-items-center`}
+                        className={`alert d-flex justify-content-between flex-wrap ${totalAllocated > extraMoney ? "alert-danger" : "alert-warning"
+                            }`}
                     >
-                        <span>
+                        <span className="w-100-sm mb-2">
                             {totalAllocated > extraMoney ? (
                                 <>You cannot allocate more than your Extra Money ({currency(extraMoney)})!</>
                             ) : remaining > 0 ? (
-                                <>
-                                    You still have <strong>{currency(remaining)}</strong> unallocated.
-                                </>
+                                <>You still have <strong>{currency(remaining)}</strong> unallocated.</>
                             ) : (
                                 <>All Extra Money allocated.</>
                             )}
                         </span>
-                        <span className="text-muted">
+
+                        <span className="text-muted w-100-sm text-end">
                             Total Allocated: <strong>{currency(totalAllocated)}</strong>
                         </span>
                     </div>
 
-                    {/* Table */}
+                    {/* ALLOCATIONS TABLE — Mobile → Card */}
                     <div className="table-responsive table-rounded">
                         <table className="table table-soft table-hover align-middle mb-0">
                             <thead>
                                 <tr>
                                     <th>Savings Type</th>
-                                    <th className="text-center">Current</th>
-                                    <th className="text-center">Target</th>
-                                    <th className="text-center" style={{ width: 140 }}>
+                                    <th className="text-start">Current</th>
+                                    <th className="text-start">Target</th>
+                                    <th className="text-start" style={{ width: 140 }}>
                                         Add Amount ($)
                                     </th>
                                     <th className="text-center" style={{ width: 120 }}>
@@ -400,49 +387,67 @@ const SavingPage = () => {
                                     const addVal = allocations[item.id] ?? 0;
                                     return (
                                         <tr key={item.id}>
-                                            <td className="fw-semibold d-flex align-items-center gap-2">
-                                                <i className={`bi ${iconByType(item.type)} text-primary`}></i>
-                                                {item.name} <span className="text-muted">({typeLabel(item.type)})</span>
+                                            {/* Savings Type */}
+                                            <td data-label="Savings Type">
+                                                <div className="saving-type">
+                                                    <i className={`bi ${iconByType(item.type)} text-primary`}></i>
+                                                    <span className="name">{item.name}</span>
+                                                    <span className="type text-muted">({typeLabel(item.type)})</span>
+                                                </div>
                                             </td>
-                                            <td className="text-center">{currency(item.balance ?? 0)}</td>
-                                            <td className="text-center">
+
+                                            {/* Current */}
+                                            <td data-label="Current" className="text-start">
+                                                {currency(item.balance ?? 0)}
+                                            </td>
+
+                                            {/* Target */}
+                                            <td data-label="Target" className="text-start">
                                                 {item.target != null ? currency(item.target) : "—"}
                                             </td>
-                                            <td className="text-center">
-                                                <input
-                                                    type="number"
-                                                    className="form-control form-control-sm text-center"
-                                                    value={addVal}
-                                                    onChange={(e) =>
-                                                        setAllocations((prev) => ({
-                                                            ...prev,
-                                                            [item.id]: Number(e.target.value) || 0,
-                                                        }))
-                                                    }
-                                                    placeholder="0"
-                                                    min="0"
-                                                    style={{ maxWidth: 110, margin: "0 auto" }}
-                                                />
+
+                                            {/* Add Amount */}
+                                            <td data-label="Add Amount">
+                                                <div className="amount-input">
+                                                    <input
+                                                        type="number"
+                                                        className="form-control form-control-sm text-center"
+                                                        value={addVal}
+                                                        onChange={(e) =>
+                                                            setAllocations((prev) => ({
+                                                                ...prev,
+                                                                [item.id]: Number(e.target.value) || 0,
+                                                            }))
+                                                        }
+                                                        min="0"
+                                                        placeholder="0"
+                                                    />
+                                                </div>
                                             </td>
-                                            <td className="text-center">
-                                                <button
-                                                    className="btn btn-ghost btn-sm me-2"
-                                                    title="Edit"
-                                                    onClick={() => openEdit(item)}
-                                                >
-                                                    <i className="bi bi-pencil"></i>
-                                                </button>
-                                                <button
-                                                    className="btn btn-ghost btn-sm"
-                                                    title="Delete"
-                                                    onClick={() => confirmDelete(item)}
-                                                >
-                                                    <i className="bi bi-trash text-danger"></i>
-                                                </button>
+
+                                            {/* Actions */}
+                                            <td data-label="Actions" data-actions="true">
+                                                <div className="cell-actions">
+                                                    <button
+                                                        className="btn btn-ghost btn-sm me-2"
+                                                        title="Edit"
+                                                        onClick={() => openEdit(item)}
+                                                    >
+                                                        <i className="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-ghost btn-sm"
+                                                        title="Delete"
+                                                        onClick={() => confirmDelete(item)}
+                                                    >
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     );
                                 })}
+
                                 {items.length === 0 && (
                                     <tr>
                                         <td colSpan={5} className="text-center py-4 text-muted">
@@ -455,6 +460,7 @@ const SavingPage = () => {
                     </div>
                 </div>
             </div>
+
 
             {/* ===== Modals ===== */}
 

@@ -916,3 +916,56 @@ small.muted {
                 display: none;
             }
 }
+
+/* ===== Savings Allocations – Mobile organization ===== */
+@media (max-width: 576px) {
+    /* Slightly wider label column and neat vertical rhythm */
+    .table-rounded .table.table-soft tbody tr td {
+        grid-template-columns: 42% 1fr; /* LABEL | VALUE */
+        align-items: center;
+    }
+
+    /* Savings Type value: icon + bold name + muted type */
+    .saving-type {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        flex-wrap: wrap;
+    }
+
+        .saving-type .name {
+            font-weight: 700;
+        }
+
+        .saving-type .type {
+            font-weight: 600;
+        }
+
+    /* Right align numeric values cleanly in the value column */
+    .table-rounded .table.table-soft tbody tr td[data-label="Current"],
+    .table-rounded .table.table-soft tbody tr td[data-label="Target"] {
+        justify-content: flex-end; /* grid value column */
+        text-align: right; /* desktop fallback */
+    }
+
+    /* Add Amount: input fills the value column nicely */
+    .amount-input .form-control {
+        width: 100%;
+        max-width: 260px; /* prevents too wide on phablets; change as you prefer */
+        margin-left: auto; /* align right to match numbers */
+        margin-right: 0;
+    }
+
+    /* Actions buttons inline, aligned left of value column by default */
+    .table-rounded .table.table-soft tbody tr td[data-actions="true"] .cell-actions {
+        display: inline-flex;
+        gap: .5rem;
+        align-items: center;
+        justify-content: flex-start; /* change to flex-end if you prefer right edge */
+    }
+
+    /* Tighter label text for mobile labels (optional) */
+    .table-rounded .table.table-soft tbody tr td::before {
+        font-size: .84rem;
+    }
+}
