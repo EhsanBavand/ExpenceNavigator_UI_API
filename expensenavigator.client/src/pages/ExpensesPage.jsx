@@ -24,11 +24,15 @@ import {
     copyCategoryBudget,
 } from "../services/api";
 
-// Month names (shared)
+/* Month names */
 const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
 ];
+
+/* Currency helper (keeps UI consistent) */
+const currency = (v) =>
+    new Intl.NumberFormat(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 })
+        .format(Number(v || 0));
 
 export default function ExpenseManager() {
     // ======= State (unchanged logic) =======
@@ -202,7 +206,7 @@ export default function ExpenseManager() {
         }
     };
 
-    // ======= Handlers (same logic; UI refined) =======
+    // ======= Handlers (logic unchanged) =======
     const handleAddCategory = async (e) => {
         e.preventDefault();
         if (!categoryName || !userId) return;
@@ -569,8 +573,8 @@ export default function ExpenseManager() {
             {/* Top Filter Panel */}
             <div className="panel">
                 <div className="panel-body">
-                    <div className="toolbar">
-                        <Form.Group className="mb-0">
+                    <div className="toolbar stack-sm">
+                        <Form.Group className="mb-0 w-100-sm">
                             <Form.Label className="mb-1">Month</Form.Label>
                             <Form.Select
                                 className="control-pill"
@@ -583,7 +587,7 @@ export default function ExpenseManager() {
                             </Form.Select>
                         </Form.Group>
 
-                        <Form.Group className="mb-0">
+                        <Form.Group className="mb-0 w-100-sm">
                             <Form.Label className="mb-1">Year</Form.Label>
                             <Form.Select
                                 className="control-pill"
@@ -592,14 +596,12 @@ export default function ExpenseManager() {
                             >
                                 {[...Array(5)].map((_, i) => {
                                     const year = now.getFullYear() - i;
-                                    return (
-                                        <option key={year} value={year}>{year}</option>
-                                    );
+                                    return <option key={year} value={year}>{year}</option>;
                                 })}
                             </Form.Select>
                         </Form.Group>
 
-                        <Button className="btn-pill btn-green" onClick={handleSearchByMonth}>
+                        <Button className="btn-pill btn-green full-btn-sm" onClick={handleSearchByMonth}>
                             <i className="bi bi-search"></i>
                             <span className="ms-1">Search</span>
                         </Button>
@@ -607,14 +609,62 @@ export default function ExpenseManager() {
                 </div>
             </div>
 
+            {/* KPI Summary + Actions */}
+            <div className="panel">
+                <div className="panel-body">
+                    {/* KPI Cards */}
+                    <div className="kpi-grid mb-3">
+                        <div className="kpi-card kpi--income">
+                            <div className="kpi-title">Total Income</div>
+                            <div className="kpi-value">{currency(summary.totalIncome)}</div>
+                            <div className="kpi-sub">This month</div>
+                            <div className="kpi-icon"><i className="bi bi-wallet2"></i></div>
+                        </div>
+
+                        <div className="kpi-card kpi--budget">
+                            <div className="kpi-title">Total Budget</div>
+                            <div className="kpi-value">{currency(summary.totalBudget)}</div>
+                            <div className="kpi-sub">This month</div>
+                            <div className="kpi-icon"><i className="bi bi-clipboard2-data"></i></div>
+                        </div>
+
+                        <div className="kpi-card kpi--remaining">
+                            <div className="kpi-title">Remaining Budget</div>
+                            <div className="kpi-value">
+                                {currency(summary.remainingBudget)}
+                            </div>
+                            <div className="kpi-sub">This month</div>
+                            <div className="kpi-icon"><i className="bi bi-piggy-bank"></i></div>
+                        </div>
+
+                        <div className="kpi-card kpi--expense">
+                            <div className="kpi-title">Total Expense</div>
+                            <div className="kpi-value">{currency(summary.totalExpenses)}</div>
+                            <div className="kpi-sub">This month</div>
+                            <div className="kpi-icon"><i className="bi bi-receipt"></i></div>
+                        </div>
+                    </div>
+
+                    {/* Header-like actions (copy) */}
+                    {/*<div className="d-flex gap-2 stack-sm">*/}
+                    {/*    <Button className="btn-pill btn-blue full-btn-sm" onClick={() => setShowCopyCategoryBudgetModal(true)}>*/}
+                    {/*        <i className="bi bi-files"></i>*/}
+                    {/*        <span className="ms-1">Copy Categories to Next Month</span>*/}
+                    {/*    </Button>*/}
+                    {/*    <Button className="btn-pill btn-green full-btn-sm" onClick={() => setShowGenerateExpenseModal(true)}>*/}
+                    {/*        <i className="bi bi-calendar2-plus"></i>*/}
+                    {/*        <span className="ms-1">Copy Expenses to Next Month</span>*/}
+                    {/*    </Button>*/}
+                    {/*</div>*/}
+                </div>
+            </div>
+
             {/* Manage (Forms) */}
             <div className="panel">
                 <div className="panel-header">
-                    <h6 className="panel-title mb-0">Manage</h6>
-                    {/* optional right actions could go here */}
+                    <h6 className="panel-header-title">Manage</h6>
                 </div>
                 <div className="panel-body">
-                    {/* Segmented-like tab buttons (styled with your theme) */}
                     <div className="d-flex flex-wrap gap-2 mb-3">
                         {["category", "subCategory", "place", "expense"].map((tab) => (
                             <Button
@@ -627,7 +677,6 @@ export default function ExpenseManager() {
                         ))}
                     </div>
 
-                    {/* Tab forms */}
                     {formTab === "category" && (
                         <form onSubmit={handleAddCategory}>
                             <div className="row g-2">
@@ -837,57 +886,19 @@ export default function ExpenseManager() {
             {/* Overview & Tables */}
             <div className="panel">
                 <div className="panel-header">
-                    <h6 className="panel-title mb-0">Overview & Tables</h6>
-                    <div className="d-flex gap-2">
-                        <Button className="btn-pill btn-blue" onClick={() => setShowCopyCategoryBudgetModal(true)}>
+                    <h6 className="panel-header-title">Overview &amp; Tables</h6>
+                    <div className="d-flex gap-2 stack-sm">
+                        <Button className="btn-pill btn-blue full-btn-sm" onClick={() => setShowCopyCategoryBudgetModal(true)}>
                             <i className="bi bi-files"></i><span className="ms-1">Copy Categories</span>
                         </Button>
-                        <Button className="btn-pill btn-green" onClick={() => setShowGenerateExpenseModal(true)}>
+                        <Button className="btn-pill btn-green full-btn-sm" onClick={() => setShowGenerateExpenseModal(true)}>
                             <i className="bi bi-calendar2-plus"></i><span className="ms-1">Copy Expenses</span>
                         </Button>
                     </div>
                 </div>
 
                 <div className="panel-body">
-                    {/* Summary row (kept simple) */}
-                    <div className="row g-3 mb-3">
-                        <div className="col-12 col-md-3">
-                            <div className="panel">
-                                <div className="panel-body text-center">
-                                    <div className="text-muted">Total Income</div>
-                                    <div className="fw-bold text-success">${summary.totalIncome}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-12 col-md-3">
-                            <div className="panel">
-                                <div className="panel-body text-center">
-                                    <div className="text-muted">Total Budget</div>
-                                    <div className="fw-bold text-primary">${summary.totalBudget}</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-12 col-md-3">
-                            <div className="panel">
-                                <div className="panel-body text-center">
-                                    <div className="text-muted">Remaining Budget</div>
-                                    <div className={`fw-bold ${summary.remainingIncome < 0 ? "text-danger" : "text-success"}`}>
-                                        ${summary.remainingBudget}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-12 col-md-3">
-                            <div className="panel">
-                                <div className="panel-body text-center">
-                                    <div className="text-muted">Total Expense</div>
-                                    <div className="fw-bold text-primary">${summary.totalExpenses}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Table Tabs (soft segmented) */}
+                    {/* Tab Toggle */}
                     <div className="d-flex flex-wrap gap-2 mb-3">
                         {["category", "subCategory", "place", "expense"].map((tab) => (
                             <Button
@@ -915,26 +926,28 @@ export default function ExpenseManager() {
                                 <tbody>
                                     {sortedCategories.map((cat) => (
                                         <tr key={cat.id}>
-                                            <td>{cat.name}</td>
-                                            <td>{cat.budget}</td>
-                                            <td>{cat.isActive ? "Yes" : "No"}</td>
-                                            <td>
-                                                <Button
-                                                    size="sm"
-                                                    className="btn-ghost me-2"
-                                                    onClick={() => openEditCategoryModal(cat)}
-                                                >
-                                                    <i className="bi bi-pencil"></i>
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    className="btn-ghost"
-                                                    onClick={() =>
-                                                        handleDelete(cat.catId, "category", userId, parseInt(selectedMonth), parseInt(selectedYear))
-                                                    }
-                                                >
-                                                    <i className="bi bi-trash text-danger"></i>
-                                                </Button>
+                                            <td data-label="Name">{cat.name}</td>
+                                            <td data-label="Budget">{currency(cat.budget)}</td>
+                                            <td data-label="Active">{cat.isActive ? "Yes" : "No"}</td>
+                                            <td data-label="Action" data-actions="true">
+                                                <div className="cell-actions">
+                                                    <Button
+                                                        size="sm"
+                                                        className="btn-ghost me-2"
+                                                        onClick={() => openEditCategoryModal(cat)}
+                                                    >
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        className="btn-ghost"
+                                                        onClick={() =>
+                                                            handleDelete(cat.catId, "category", userId, parseInt(selectedMonth), parseInt(selectedYear))
+                                                        }
+                                                    >
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </Button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -963,20 +976,22 @@ export default function ExpenseManager() {
                                 <tbody>
                                     {sortedSubCategories.map((sc) => (
                                         <tr key={sc.id}>
-                                            <td>{sc.name}</td>
-                                            <td>{categories.find((c) => c.catId === sc.categoryId)?.name || "-"}</td>
-                                            <td>{sc.isActive ? "Yes" : "No"}</td>
-                                            <td>
-                                                <Button size="sm" className="btn-ghost me-2" onClick={() => openEditSubCategoryModal(sc)}>
-                                                    <i className="bi bi-pencil"></i>
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    className="btn-ghost"
-                                                    onClick={() => handleDelete(sc.id, "subCategory", userId, selectedMonth, selectedYear)}
-                                                >
-                                                    <i className="bi bi-trash text-danger"></i>
-                                                </Button>
+                                            <td data-label="Name">{sc.name}</td>
+                                            <td data-label="Category">{categories.find((c) => c.catId === sc.categoryId)?.name || "-"}</td>
+                                            <td data-label="Active">{sc.isActive ? "Yes" : "No"}</td>
+                                            <td data-label="Action" data-actions="true">
+                                                <div className="cell-actions">
+                                                    <Button size="sm" className="btn-ghost me-2" onClick={() => openEditSubCategoryModal(sc)}>
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        className="btn-ghost"
+                                                        onClick={() => handleDelete(sc.id, "subCategory", userId, selectedMonth, selectedYear)}
+                                                    >
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </Button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -1009,19 +1024,21 @@ export default function ExpenseManager() {
                                 <tbody>
                                     {sortedPlaces.map((p) => (
                                         <tr key={p.id}>
-                                            <td>{p.name}</td>
-                                            <td>{p.isActive ? "Yes" : "No"}</td>
-                                            <td>
-                                                <Button size="sm" className="btn-ghost me-2" onClick={() => openEditPlaceModal(p)}>
-                                                    <i className="bi bi-pencil"></i>
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    className="btn-ghost"
-                                                    onClick={() => handleDelete(p.id, "place", userId, selectedMonth, selectedYear)}
-                                                >
-                                                    <i className="bi bi-trash text-danger"></i>
-                                                </Button>
+                                            <td data-label="Name">{p.name}</td>
+                                            <td data-label="Active">{p.isActive ? "Yes" : "No"}</td>
+                                            <td data-label="Action" data-actions="true">
+                                                <div className="cell-actions">
+                                                    <Button size="sm" className="btn-ghost me-2" onClick={() => openEditPlaceModal(p)}>
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        className="btn-ghost"
+                                                        onClick={() => handleDelete(p.id, "place", userId, selectedMonth, selectedYear)}
+                                                    >
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </Button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -1041,10 +1058,8 @@ export default function ExpenseManager() {
                             <table className="table table-soft table-hover align-middle mb-0" style={{ fontSize: "0.95rem" }}>
                                 <thead>
                                     <tr>
-                                        <th
-                                            style={{ width: "120px", cursor: "pointer" }}
-                                            onClick={() => setExpenseSort({ field: "date", asc: !expenseSort.asc })}
-                                        >
+                                        <th style={{ width: "120px", cursor: "pointer" }}
+                                            onClick={() => setExpenseSort({ field: "date", asc: !expenseSort.asc })}>
                                             Date
                                         </th>
                                         <th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "category", asc: !expenseSort.asc })}>
@@ -1060,7 +1075,8 @@ export default function ExpenseManager() {
                                         <th style={{ width: "120px" }}>Paid For</th>
                                         <th style={{ width: "140px" }}>Item</th>
                                         <th style={{ width: "180px" }}>Note</th>
-                                        <th className="text-center" style={{ width: "80px", cursor: "pointer" }} onClick={() => toggleExpenseSort("isFixed")}>
+                                        <th style={{ width: "80px", cursor: "pointer" }}
+                                            onClick={() => toggleExpenseSort("isFixed")}>
                                             Fixed
                                         </th>
                                         <th className="text-center" style={{ width: "80px" }}>Actions</th>
@@ -1069,24 +1085,42 @@ export default function ExpenseManager() {
                                 <tbody>
                                     {sortedExpenses.map((exp) => (
                                         <tr key={exp.id}>
-                                            <td className="text-nowrap text-muted">{exp.date?.split("T")[0]}</td>
-                                            <td>{getCategoryName(exp.categoryId)}</td>
-                                            <td>{getSubCategoryName(exp.subCategoryId)}</td>
-                                            <td>{getPlaceName(exp.placeId)}</td>
-                                            <td className="fw-semibold">${Number(exp.amount).toFixed(2)}</td>
-                                            <td>{exp.paidFor}</td>
-                                            <td className="text-truncate" style={{ maxWidth: "140px" }} title={exp.itemName}>
+                                            <td data-label="Date" className="text-nowrap text-muted">
+                                                {exp.date?.split("T")[0]}
+                                            </td>
+                                            <td data-label="Category">{getCategoryName(exp.categoryId)}</td>
+                                            <td data-label="SubCategory">{getSubCategoryName(exp.subCategoryId)}</td>
+                                            <td data-label="Place">{getPlaceName(exp.placeId)}</td>
+                                            <td data-label="Amount" className="fw-semibold">{currency(exp.amount)}</td>
+                                            <td data-label="Paid For">{exp.paidFor}</td>
+                                            <td data-label="Item" className="text-truncate" style={{ maxWidth: "140px" }} title={exp.itemName}>
                                                 {exp.itemName}
                                             </td>
-                                            <td className="text-truncate text-muted" style={{ maxWidth: "180px" }} title={exp.note}>
+                                            <td data-label="Note" className="text-truncate text-muted" style={{ maxWidth: "180px" }} title={exp.note}>
                                                 {exp.note}
                                             </td>
-                                            <td className="text-center">
+                                            <td data-label="Fixed">
                                                 {exp.isFixed ? <span className="badge-soft success">Yes</span> : <span className="badge-soft">No</span>}
                                             </td>
-                                            <td className="text-center" style={{ fontSize: "1rem" }}>
-                                                <FaPen className="text-primary me-2" style={{ cursor: "pointer" }} title="Edit" onClick={() => openEditExpenseModal(exp)} />
-                                                <FaTrash className="text-danger" style={{ cursor: "pointer" }} title="Delete" onClick={() => handleDelete(exp.id, "expense")} />
+                                           
+                                            <td data-label="Actions" data-actions="true">
+                                                <div className="cell-actions d-flex align-items-center gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        className="btn-ghost"
+                                                        onClick={() => openEditExpenseModal(exp)}
+                                                    >
+                                                        <i className="bi bi-pencil"></i>
+                                                    </Button>
+
+                                                    <Button
+                                                        size="sm"
+                                                        className="btn-ghost"
+                                                        onClick={() => handleDelete(exp.id, "expense")}
+                                                    >
+                                                        <i className="bi bi-trash text-danger"></i>
+                                                    </Button>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -1288,6 +1322,7 @@ export default function ExpenseManager() {
                 </div>
             )}
 
+
             {/* Edit Expense */}
             {editExpenseModalOpen && (
                 <div className="modal show d-block" tabIndex="-1">
@@ -1297,7 +1332,9 @@ export default function ExpenseManager() {
                                 <h5 className="modal-title">Edit Expense</h5>
                                 <button type="button" className="btn-close" onClick={() => setEditExpenseModalOpen(false)}></button>
                             </div>
+
                             <div className="modal-body">
+                                {/* Wrap the grid so mobile rules apply cleanly */}
                                 <div className="row g-2">
                                     <div className="col-12 col-sm-6">
                                         <input
@@ -1307,6 +1344,7 @@ export default function ExpenseManager() {
                                             onChange={(e) => setEditExpenseForm((prev) => ({ ...prev, date: e.target.value }))}
                                         />
                                     </div>
+
                                     <div className="col-12 col-sm-6">
                                         <select
                                             className="form-select"
@@ -1322,6 +1360,7 @@ export default function ExpenseManager() {
                                             ))}
                                         </select>
                                     </div>
+
                                     <div className="col-12 col-sm-6">
                                         <select
                                             className="form-select"
@@ -1337,6 +1376,7 @@ export default function ExpenseManager() {
                                                 ))}
                                         </select>
                                     </div>
+
                                     <div className="col-12 col-sm-6">
                                         <select
                                             className="form-select"
@@ -1350,6 +1390,7 @@ export default function ExpenseManager() {
                                             ))}
                                         </select>
                                     </div>
+
                                     <div className="col-12 col-sm-6">
                                         <input
                                             type="number"
@@ -1359,6 +1400,7 @@ export default function ExpenseManager() {
                                             onChange={(e) => setEditExpenseForm((prev) => ({ ...prev, amount: e.target.value }))}
                                         />
                                     </div>
+
                                     <div className="col-12 col-sm-6">
                                         <input
                                             type="text"
@@ -1368,6 +1410,7 @@ export default function ExpenseManager() {
                                             onChange={(e) => setEditExpenseForm((prev) => ({ ...prev, paidFor: e.target.value }))}
                                         />
                                     </div>
+
                                     <div className="col-12 col-sm-6">
                                         <input
                                             type="text"
@@ -1377,6 +1420,7 @@ export default function ExpenseManager() {
                                             onChange={(e) => setEditExpenseForm((prev) => ({ ...prev, itemName: e.target.value }))}
                                         />
                                     </div>
+
                                     <div className="col-12">
                                         <textarea
                                             className="form-control"
@@ -1385,6 +1429,7 @@ export default function ExpenseManager() {
                                             onChange={(e) => setEditExpenseForm((prev) => ({ ...prev, note: e.target.value }))}
                                         />
                                     </div>
+
                                     <div className="col-12">
                                         <div className="form-check mb-2">
                                             <input
@@ -1392,12 +1437,14 @@ export default function ExpenseManager() {
                                                 className="form-check-input"
                                                 checked={!!editExpenseForm.isFixed}
                                                 onChange={(e) => setEditExpenseForm((prev) => ({ ...prev, isFixed: e.target.checked }))}
+                                                id="edit-expense-fixed"
                                             />
-                                            <label className="form-check-label">Fixed Expense</label>
+                                            <label className="form-check-label" htmlFor="edit-expense-fixed">Fixed Expense</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div className="modal-footer">
                                 <button className="btn btn-secondary" onClick={() => setEditExpenseModalOpen(false)}>Cancel</button>
                                 <button className="btn btn-primary" onClick={() => saveEditExpense(editExpenseForm.id)}>Save Changes</button>
@@ -1412,9 +1459,11 @@ export default function ExpenseManager() {
                 <Modal.Header closeButton><Modal.Title>Copy Expense</Modal.Title></Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Source Month & Year</Form.Label>
-                        <div className="d-flex gap-2">
+                        <Form.Label className="fw-semibold">Source Month &amp; Year</Form.Label>
+                        {/* stack on phones */}
+                        <div className="stack-sm">
                             <Form.Select
+                                className="w-100-sm"
                                 value={generateRange.sourceMonth}
                                 onChange={(e) => {
                                     const val = Number(e.target.value);
@@ -1430,7 +1479,9 @@ export default function ExpenseManager() {
                                     <option key={i + 1} value={i + 1}>{m}</option>
                                 ))}
                             </Form.Select>
+
                             <Form.Control
+                                className="w-100-sm"
                                 type="number"
                                 value={generateRange.sourceYear}
                                 onChange={(e) => setGenerateRange((p) => ({ ...p, sourceYear: Number(e.target.value) }))}
@@ -1440,31 +1491,40 @@ export default function ExpenseManager() {
 
                     <Form.Group className="mb-3">
                         <Form.Label className="fw-semibold">Copy to Months</Form.Label>
-                        <div className="d-flex gap-2 align-items-center">
-                            <Form.Label className="mb-0">From</Form.Label>
-                            <Form.Select
-                                value={generateRange.fromMonth}
-                                onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
-                                }}
-                            >
-                                {monthNames
-                                    .map((m, i) => ({ label: m, value: i + 1 }))
-                                    .filter((m) => m.value > generateRange.sourceMonth)
-                                    .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                            </Form.Select>
 
-                            <Form.Label className="mb-0">To</Form.Label>
-                            <Form.Select
-                                value={generateRange.toMonth}
-                                onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
-                            >
-                                {monthNames
-                                    .map((m, i) => ({ label: m, value: i + 1 }))
-                                    .filter((m) => m.value >= generateRange.fromMonth)
-                                    .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                            </Form.Select>
+                        {/* From row */}
+                        <div className="stack-sm">
+                            <div className="d-flex gap-2 align-items-center w-100-sm">
+                                <Form.Label className="mb-0">From</Form.Label>
+                                <Form.Select
+                                    className="w-100-sm"
+                                    value={generateRange.fromMonth}
+                                    onChange={(e) => {
+                                        const val = Number(e.target.value);
+                                        setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
+                                    }}
+                                >
+                                    {monthNames
+                                        .map((m, i) => ({ label: m, value: i + 1 }))
+                                        .filter((m) => m.value > generateRange.sourceMonth)
+                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                </Form.Select>
+                            </div>
+
+                            {/* To row */}
+                            <div className="d-flex gap-2 align-items-center w-100-sm">
+                                <Form.Label className="mb-0">To</Form.Label>
+                                <Form.Select
+                                    className="w-100-sm"
+                                    value={generateRange.toMonth}
+                                    onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
+                                >
+                                    {monthNames
+                                        .map((m, i) => ({ label: m, value: i + 1 }))
+                                        .filter((m) => m.value >= generateRange.fromMonth)
+                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                </Form.Select>
+                            </div>
                         </div>
 
                         {!copyMessage && (
@@ -1473,7 +1533,6 @@ export default function ExpenseManager() {
                                 Target months must be after the source month and within the same year.
                             </Alert>
                         )}
-
                         {copyMessage && (
                             <Alert
                                 variant={copyMessage.toLowerCase().includes("success") ? "success" : "warning"}
@@ -1516,9 +1575,10 @@ export default function ExpenseManager() {
                 <Modal.Header closeButton><Modal.Title>Copy Category Budget</Modal.Title></Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Source Month & Year</Form.Label>
-                        <div className="d-flex gap-2">
+                        <Form.Label className="fw-semibold">Source Month &amp; Year</Form.Label>
+                        <div className="stack-sm">
                             <Form.Select
+                                className="w-100-sm"
                                 value={categoryBudgetRange.sourceMonth}
                                 onChange={(e) => {
                                     const val = Number(e.target.value);
@@ -1534,7 +1594,9 @@ export default function ExpenseManager() {
                                     <option key={i + 1} value={i + 1}>{m}</option>
                                 ))}
                             </Form.Select>
+
                             <Form.Control
+                                className="w-100-sm"
                                 type="number"
                                 value={categoryBudgetRange.sourceYear}
                                 onChange={(e) => setCategoryBudgetRange((p) => ({ ...p, sourceYear: Number(e.target.value) }))}
@@ -1544,31 +1606,38 @@ export default function ExpenseManager() {
 
                     <Form.Group className="mb-3">
                         <Form.Label className="fw-semibold">Copy to Months</Form.Label>
-                        <div className="d-flex gap-2 align-items-center">
-                            <Form.Label className="mb-0">From</Form.Label>
-                            <Form.Select
-                                value={categoryBudgetRange.fromMonth}
-                                onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    setCategoryBudgetRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
-                                }}
-                            >
-                                {monthNames
-                                    .map((m, i) => ({ label: m, value: i + 1 }))
-                                    .filter((m) => m.value > categoryBudgetRange.sourceMonth)
-                                    .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                            </Form.Select>
 
-                            <Form.Label className="mb-0">To</Form.Label>
-                            <Form.Select
-                                value={categoryBudgetRange.toMonth}
-                                onChange={(e) => setCategoryBudgetRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
-                            >
-                                {monthNames
-                                    .map((m, i) => ({ label: m, value: i + 1 }))
-                                    .filter((m) => m.value >= categoryBudgetRange.fromMonth)
-                                    .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                            </Form.Select>
+                        <div className="stack-sm">
+                            <div className="d-flex gap-2 align-items-center w-100-sm">
+                                <Form.Label className="mb-0">From</Form.Label>
+                                <Form.Select
+                                    className="w-100-sm"
+                                    value={categoryBudgetRange.fromMonth}
+                                    onChange={(e) => {
+                                        const val = Number(e.target.value);
+                                        setCategoryBudgetRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
+                                    }}
+                                >
+                                    {monthNames
+                                        .map((m, i) => ({ label: m, value: i + 1 }))
+                                        .filter((m) => m.value > categoryBudgetRange.sourceMonth)
+                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                </Form.Select>
+                            </div>
+
+                            <div className="d-flex gap-2 align-items-center w-100-sm">
+                                <Form.Label className="mb-0">To</Form.Label>
+                                <Form.Select
+                                    className="w-100-sm"
+                                    value={categoryBudgetRange.toMonth}
+                                    onChange={(e) => setCategoryBudgetRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
+                                >
+                                    {monthNames
+                                        .map((m, i) => ({ label: m, value: i + 1 }))
+                                        .filter((m) => m.value >= categoryBudgetRange.fromMonth)
+                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                </Form.Select>
+                            </div>
                         </div>
 
                         {!categoryCopyMessage && (
@@ -1613,5 +1682,5 @@ export default function ExpenseManager() {
                 </Modal.Footer>
             </Modal>
         </div>
-    );
-}
+    )
+};

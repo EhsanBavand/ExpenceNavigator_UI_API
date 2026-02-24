@@ -728,17 +728,190 @@ small.muted {
             .table-rounded .table.table-soft tfoot td:nth-child(1) {
                 font-weight: 700;
                 color: hsl(var(--foreground));
-                margin:5px 10px;
+                margin: 5px 10px;
             }
 
             /* Value (second cell) */
             .table-rounded .table.table-soft tfoot td:nth-child(2) {
                 font-weight: 800;
-                white-space: nowrap; 
-                margin:5px 10px;
+                white-space: nowrap;
+                margin: 5px 10px;
             }
 
             /* Hide the 3rd cell (empty colSpan) on phones */
+            .table-rounded .table.table-soft tfoot td:nth-child(3) {
+                display: none;
+            }
+}
+
+/* ============================
+   KPI / Summary Cards
+   ============================ */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+@media (max-width: 1199.98px) {
+    .kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 991.98px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kpi-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    color: #fff;
+    border: 0;
+    padding: 16px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.12);
+}
+
+    .kpi-card .kpi-title {
+        font-weight: 700;
+        letter-spacing: .2px;
+        font-size: .92rem;
+        opacity: .95;
+    }
+
+    .kpi-card .kpi-value {
+        font-weight: 800;
+        font-size: 1.75rem;
+        line-height: 1.1;
+    }
+
+    .kpi-card .kpi-sub {
+        font-size: .8rem;
+        opacity: .9;
+    }
+
+    .kpi-card .kpi-icon {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255,255,255,.18);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+/* Colorways (gradients) */
+.kpi--income {
+    background: var(--gradient-income);
+}
+
+.kpi--budget {
+    background: linear-gradient(135deg, #7c3aed, #a78bfa);
+}
+
+.kpi--remaining {
+    background: linear-gradient(135deg, #2563eb, #60a5fa);
+}
+
+.kpi--expense {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+/* Header actions row in panel header (already used on Income) */
+.panel-header .btn-pill {
+    height: var(--control-h) !important;
+    padding: 0 1.1rem !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius) !important;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1 !important;
+}
+
+/* Stack header buttons on phones */
+@media (max-width: 576px) {
+    .panel-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+    }
+
+        .panel-header .btn-pill {
+            width: 100%;
+            justify-content: center;
+        }
+}
+
+/* Keep the two header buttons consistent (same as Income) */
+.btn-blue, .btn-green {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+/* ===== Expense tables (mobile table ➜ card) inherit your global rules ===== */
+/* (No change needed if you already pasted the shared mobile rules.) */
+
+/* Make “Total” footer in mobile look like a footer-card (same as Income behavior) */
+@media (max-width: 576px) {
+    .table-rounded .table.table-soft tfoot {
+        display: block;
+        padding: 0;
+        margin: 0;
+    }
+
+        .table-rounded .table.table-soft tfoot tr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: .75rem;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            padding: .6rem .75rem;
+            margin: .65rem 0 0;
+        }
+
+        .table-rounded .table.table-soft tfoot td,
+        .table-rounded .table.table-soft tfoot th {
+            border: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            font-size: 1rem;
+            line-height: 1.25;
+        }
+
+            .table-rounded .table.table-soft tfoot td.text-end {
+                text-align: left !important;
+            }
+
+            .table-rounded .table.table-soft tfoot td:nth-child(1) {
+                font-weight: 700;
+                color: hsl(var(--foreground));
+            }
+
+            .table-rounded .table.table-soft tfoot td:nth-child(2) {
+                font-weight: 800;
+                white-space: nowrap;
+            }
+
             .table-rounded .table.table-soft tfoot td:nth-child(3) {
                 display: none;
             }
