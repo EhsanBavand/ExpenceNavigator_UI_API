@@ -102,7 +102,10 @@ const IncomePage = () => {
         if (!token) return setError("User is not authenticated");
         try {
             const decoded = jwtDecode(token);
-            const id = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || decoded.sub || null;
+            const id =
+                decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] ||
+                decoded.sub ||
+                null;
             if (!id) setError("User is not authenticated");
             else setUserId(id);
         } catch {
@@ -153,7 +156,12 @@ const IncomePage = () => {
         const { name, value, type, checked } = e.target;
         setFormData((p) => ({
             ...p,
-            [name]: type === "checkbox" ? checked : (name === "month" || name === "year") ? Number(value) : value,
+            [name]:
+                type === "checkbox"
+                    ? checked
+                    : name === "month" || name === "year"
+                        ? Number(value)
+                        : value,
         }));
     };
 
@@ -303,9 +311,7 @@ const IncomePage = () => {
             setIncomeList((prev) =>
                 prev.map((income) => ({
                     ...income,
-                    sourceType:
-                        r.data.find((s) => s.id === income.incomeSourceId)?.name ||
-                        income.sourceType,
+                    sourceType: r.data.find((s) => s.id === income.incomeSourceId)?.name || income.sourceType,
                 }))
             );
         } catch (e) {
@@ -341,7 +347,7 @@ const IncomePage = () => {
 
     /** Render */
     return (
-        <div className="container mt-4" style={{ margin: "auto" }}>
+        <div className="container-fluid px-3 px-md-4 mt-3">
             {/* Page header with very light underline */}
             <h4 className="page-title">Income</h4>
             <div className="page-header-line"></div>
@@ -349,8 +355,9 @@ const IncomePage = () => {
             {/* Filter toolbar */}
             <div className="panel">
                 <div className="panel-body">
-                    <div className="toolbar">
-                        <Form.Group className="mb-0">
+                    {/* vertical stack on phones */}
+                    <div className="toolbar stack-sm">
+                        <Form.Group className="mb-0 w-100-sm">
                             <Form.Label className="form-label mb-1">Month</Form.Label>
                             <Form.Select
                                 className="control-pill"
@@ -363,7 +370,7 @@ const IncomePage = () => {
                             </Form.Select>
                         </Form.Group>
 
-                        <Form.Group className="mb-0">
+                        <Form.Group className="mb-0 w-100-sm">
                             <Form.Label className="form-label mb-1">Year</Form.Label>
                             <Form.Select
                                 className="control-pill"
@@ -377,7 +384,8 @@ const IncomePage = () => {
                             </Form.Select>
                         </Form.Group>
 
-                        <Button className="btn-pill btn-green" onClick={handleSearchByMonth}>
+                        {/* full width on phones */}
+                        <Button className="btn-pill btn-green full-btn-sm" onClick={handleSearchByMonth}>
                             <i className="bi bi-search"></i>
                             <span className="ms-1">Search</span>
                         </Button>
@@ -394,7 +402,7 @@ const IncomePage = () => {
             {/* Income Sources */}
             <div className="panel mb-3">
                 <div className="panel-header">
-                    <h6 className="panel-title mb-0">Income Sources</h6>
+                    <h6 className="panel-header-title">Income Sources</h6>
                     <Button className="btn-pill btn-green" onClick={handleShowAddSourceModal}>
                         <i className="bi bi-plus-lg"></i>
                         <span className="ms-1">Add Source</span>
@@ -415,22 +423,37 @@ const IncomePage = () => {
                                 </thead>
                                 <tbody>
                                     {sourceList.length === 0 ? (
-                                        <tr><td colSpan="3" className="text-center py-4">No sources found</td></tr>
+                                        <tr>
+                                            <td colSpan="3" className="text-center py-4">No sources found</td>
+                                        </tr>
                                     ) : (
                                         sourceList.map((s) => (
                                             <tr key={s.id}>
-                                                <td className="fw-semibold d-flex align-items-center gap-2">
+                                                <td data-label="Source" className="fw-semibold d-flex align-items-center gap-2">
                                                     <i className="bi bi-check2-square text-success"></i>
                                                     {s.name}
                                                 </td>
-                                                <td className="text-muted">{s.description}</td>
-                                                <td>
-                                                    <Button size="sm" className="btn-ghost me-2" onClick={() => handleEditSource(s)}>
-                                                        <i className="bi bi-pencil"></i>
-                                                    </Button>
-                                                    <Button size="sm" className="btn-ghost" onClick={() => confirmDeleteSource(s)}>
-                                                        <i className="bi bi-trash text-danger"></i>
-                                                    </Button>
+                                                <td data-label="Description" className="text-muted">{s.description}</td>
+                                                <td data-label="Actions" data-actions="true">
+                                                    {/* keep buttons together on phones */}
+                                                    <div className="cell-actions">
+                                                        <Button
+                                                            size="sm"
+                                                            className="btn-ghost me-2"
+                                                            onClick={() => handleEditSource(s)}
+                                                            aria-label="Edit source"
+                                                        >
+                                                            <i className="bi bi-pencil"></i>
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            className="btn-ghost"
+                                                            onClick={() => confirmDeleteSource(s)}
+                                                            aria-label="Delete source"
+                                                        >
+                                                            <i className="bi bi-trash text-danger"></i>
+                                                        </Button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
@@ -445,13 +468,13 @@ const IncomePage = () => {
             {/* Income Records */}
             <div className="panel">
                 <div className="panel-header">
-                    <h6 className="panel-title mb-0">Income Records</h6>
-                    <div className="d-flex gap-2">
-                        <Button className="btn-pill btn-blue" onClick={() => setShowGenerateModal(true)}>
+                    <h6 className="panel-header-title">Income Records</h6>
+                    <div className="d-flex gap-2 stack-sm">
+                        <Button className="btn-pill btn-blue full-btn-sm" onClick={() => setShowGenerateModal(true)}>
                             <i className="bi bi-calendar-range"></i>
                             <span className="ms-1">Copy Incomes to Next Month</span>
                         </Button>
-                        <Button className="btn-pill btn-green" onClick={handleShowAddModal}>
+                        <Button className="btn-pill btn-green full-btn-sm" onClick={handleShowAddModal}>
                             <i className="bi bi-plus-lg"></i>
                             <span className="ms-1">Add Income</span>
                         </Button>
@@ -472,31 +495,48 @@ const IncomePage = () => {
                                         <th style={{ width: 120 }}>Actions</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     {incomeList.length === 0 ? (
-                                        <tr><td colSpan="5" className="text-center py-4">No incomes found</td></tr>
+                                        <tr>
+                                            <td colSpan="5" className="text-center py-4">No incomes found</td>
+                                        </tr>
                                     ) : (
                                         incomeList.map((i) => (
                                             <tr key={i.id}>
-                                                <td className="fw-semibold d-flex align-items-center gap-2">
+                                                <td data-label="Source" className="fw-semibold d-flex align-items-center gap-2">
                                                     {i.isRecurring && <span className="badge-soft success">Monthly</span>}
                                                     {i.sourceType}
                                                 </td>
-                                                <td className="fw-bold text-success">{currency(i.amount)}</td>
-                                                <td>{prettyDate(i.date)}</td>
-                                                <td className="text-muted">{i.description}</td>
-                                                <td>
-                                                    <Button size="sm" className="btn-ghost me-2" onClick={() => handleShowEditModal(i)}>
-                                                        <i className="bi bi-pencil"></i>
-                                                    </Button>
-                                                    <Button size="sm" className="btn-ghost" onClick={() => confirmDeleteIncome(i)}>
-                                                        <i className="bi bi-trash text-danger"></i>
-                                                    </Button>
+                                                <td data-label="Amount" className="fw-bold text-success">{currency(i.amount)}</td>
+                                                <td data-label="Date">{prettyDate(i.date)}</td>
+                                                <td data-label="Note" className="text-muted">{i.description}</td>
+                                                <td data-label="Actions" data-actions="true">
+                                                    {/* keep buttons together on phones */}
+                                                    <div className="cell-actions">
+                                                        <Button
+                                                            size="sm"
+                                                            className="btn-ghost me-2"
+                                                            onClick={() => handleShowEditModal(i)}
+                                                            aria-label="Edit income"
+                                                        >
+                                                            <i className="bi bi-pencil"></i>
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            className="btn-ghost"
+                                                            onClick={() => confirmDeleteIncome(i)}
+                                                            aria-label="Delete income"
+                                                        >
+                                                            <i className="bi bi-trash text-danger"></i>
+                                                        </Button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))
                                     )}
                                 </tbody>
+
                                 {incomeList.length > 0 && (
                                     <tfoot>
                                         <tr>
@@ -640,9 +680,11 @@ const IncomePage = () => {
                 <Modal.Header closeButton><Modal.Title>Copy Incomes</Modal.Title></Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Source Month & Year</Form.Label>
-                        <div className="d-flex gap-2">
+                        <Form.Label className="fw-semibold">Source Month &amp; Year</Form.Label>
+                        {/* stack on phones for better UX */}
+                        <div className="stack-sm">
                             <Form.Select
+                                className="w-100-sm"
                                 value={sourceMonth}
                                 onChange={(e) => {
                                     const val = Number(e.target.value);
@@ -652,7 +694,12 @@ const IncomePage = () => {
                             >
                                 {monthNames.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
                             </Form.Select>
-                            <Form.Control type="number" value={sourceYear} onChange={(e) => setSourceYear(Number(e.target.value))} />
+                            <Form.Control
+                                className="w-100-sm"
+                                type="number"
+                                value={sourceYear}
+                                onChange={(e) => setSourceYear(Number(e.target.value))}
+                            />
                         </div>
                     </Form.Group>
 
@@ -663,29 +710,38 @@ const IncomePage = () => {
                     ) : (
                         <Form.Group className="mb-3">
                             <Form.Label className="fw-semibold">Copy to Months</Form.Label>
-                            <div className="d-flex gap-2 align-items-center">
-                                <Form.Label className="mb-0">From</Form.Label>
-                                <Form.Select
-                                    value={generateRange.fromMonth}
-                                    onChange={(e) => {
-                                        const val = Number(e.target.value);
-                                        setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
-                                    }}
-                                >
-                                    {monthNames.map((m, i) => ({ label: m, value: i + 1 }))
-                                        .filter((m) => m.value >= sourceMonth)
-                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                </Form.Select>
+                            {/* stack on phones */}
+                            <div className="stack-sm align-items-stretch">
+                                <div className="d-flex align-items-center gap-2 w-100-sm">
+                                    <Form.Label className="mb-0">From</Form.Label>
+                                    <Form.Select
+                                        className="w-100-sm"
+                                        value={generateRange.fromMonth}
+                                        onChange={(e) => {
+                                            const val = Number(e.target.value);
+                                            setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
+                                        }}
+                                    >
+                                        {monthNames
+                                            .map((m, i) => ({ label: m, value: i + 1 }))
+                                            .filter((m) => m.value >= sourceMonth)
+                                            .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    </Form.Select>
+                                </div>
 
-                                <Form.Label className="mb-0">To</Form.Label>
-                                <Form.Select
-                                    value={generateRange.toMonth}
-                                    onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
-                                >
-                                    {monthNames.map((m, i) => ({ label: m, value: i + 1 }))
-                                        .filter((m) => m.value >= generateRange.fromMonth)
-                                        .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
-                                </Form.Select>
+                                <div className="d-flex align-items-center gap-2 w-100-sm">
+                                    <Form.Label className="mb-0">To</Form.Label>
+                                    <Form.Select
+                                        className="w-100-sm"
+                                        value={generateRange.toMonth}
+                                        onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
+                                    >
+                                        {monthNames
+                                            .map((m, i) => ({ label: m, value: i + 1 }))
+                                            .filter((m) => m.value >= generateRange.fromMonth)
+                                            .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                    </Form.Select>
+                                </div>
                             </div>
 
                             <Alert variant="info" className="mt-2 mb-0">
@@ -697,7 +753,9 @@ const IncomePage = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowGenerateModal(false)}>Cancel</Button>
-                    <Button className="btn-pill btn-blue" disabled={!hasDataToCopy}
+                    <Button
+                        className="btn-pill btn-blue"
+                        disabled={!hasDataToCopy}
                         onClick={async () => {
                             const payload = {
                                 UserId: userId,

@@ -46,7 +46,7 @@
     --sidebar-border: 220 20% 16%;
     --sidebar-ring: 162 63% 50%;
     --sidebar-muted: 220 15% 45%;
-    /* Optional gradients */
+    /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(162, 63%, 41%), hsl(162, 80%, 55%));
     --gradient-income: linear-gradient(135deg, hsl(162, 63%, 41%), hsl(142, 71%, 45%));
     --gradient-expense: linear-gradient(135deg, hsl(0, 72%, 51%), hsl(20, 80%, 55%));
@@ -90,11 +90,19 @@ h1, h2, h3, h4, h5 {
 }
 
 .panel-header {
-    padding: .75rem 1rem;
-    border-bottom: 1px solid hsl(var(--border));
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: .75rem;
+    padding: .75rem 1rem;
+    border-bottom: 1px solid hsl(var(--border));
+}
+
+.panel-header-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0;
 }
 
 .panel-body {
@@ -133,7 +141,7 @@ h1, h2, h3, h4, h5 {
         font-family: var(--font-body);
     }
 
-/* Buttons */
+/* Buttons – base “pill” */
 .btn-pill {
     height: var(--control-h);
     border-radius: var(--radius) !important;
@@ -143,8 +151,10 @@ h1, h2, h3, h4, h5 {
     padding: 0 .9rem;
     font-weight: 600;
     font-family: var(--font-display);
+    line-height: 1;
 }
 
+/* Color variants */
 .btn-green {
     background-color: hsl(var(--primary)) !important;
     color: hsl(var(--primary-foreground)) !important;
@@ -155,6 +165,16 @@ h1, h2, h3, h4, h5 {
     background-color: hsl(var(--info)) !important;
     color: #fff !important;
     border: none !important;
+    /* Ensure same visual height as green in all contexts */
+    height: var(--control-h) !important;
+    padding: 0 .9rem !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius) !important;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: .95rem;
 }
 
 .btn-ghost {
@@ -166,6 +186,11 @@ h1, h2, h3, h4, h5 {
     .btn-ghost:hover {
         background-color: hsl(var(--accent)) !important;
     }
+
+/* Light elevation */
+.btn-green, .btn-blue {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
 
 /* Tables */
 .table-rounded {
@@ -202,10 +227,9 @@ h1, h2, h3, h4, h5 {
         color: hsl(var(--accent-foreground));
     }
 
-/* ===========================================================
+/* ===========================
    SIDEBAR (token-based)
-   =========================================================== */
-
+   =========================== */
 .sidebar-root {
     position: fixed;
     top: 0;
@@ -325,26 +349,6 @@ h1, h2, h3, h4, h5 {
     color: hsl(var(--sidebar-primary-foreground));
 }
 
-/* Mobile close + overlay */
-.sidebar-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius);
-    border: 1px solid hsl(var(--sidebar-border));
-    background: hsl(var(--sidebar-accent));
-    color: hsl(var(--sidebar-accent-foreground));
-}
-
-.sidebar-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, .25);
-    z-index: 1030;
-}
-
 /* Mobile slide in/out */
 @media (max-width: 767.98px) {
     .sidebar-root.closed {
@@ -363,25 +367,9 @@ h1, h2, h3, h4, h5 {
     }
 }
 
-/* Mobile table + header tweaks */
-@media (max-width: 576px) {
-    .panel-header .d-flex.gap-2 {
-        flex-direction: column;
-    }
-
-    .panel-header .btn {
-        width: 100%;
-    }
-
-    .table-soft thead th, .table-soft tbody td {
-        padding: .55rem .6rem;
-        font-size: .92rem;
-    }
-}
-
-/* ===========================================================
-   Select chevron for .control-pill (Month/Year)
-   =========================================================== */
+/* ===========================
+   Select chevron for .control-pill
+   =========================== */
 
 /* Reset native arrows so we can draw our own */
 select.control-pill,
@@ -390,7 +378,7 @@ select.control-pill,
     appearance: none; /* Standard */
     -webkit-appearance: none; /* Safari/Chromium */
     -moz-appearance: none; /* Firefox */
-    background-color: #fff; /* ensure white base so SVG looks clean */
+    background-color: #fff;
     background-image: none !important; /* remove Bootstrap default */
 }
 
@@ -402,26 +390,14 @@ select.control-pill,
     background-repeat: no-repeat;
     background-position: right 0.6rem center;
     background-size: 14px 14px;
-    padding-right: 2rem !important; /* make space for the chevron */
+    padding-right: 2rem !important; /* space for the chevron */
     line-height: 1.2;
 }
 
-    /* Optional softer chevron tone: replace %23111827 with %236b7280 to use #6B7280 */
-    /*
-select.control-pill,
-.toolbar select.control-pill,
-.panel-body select.control-pill {
-  background-image:
-    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none'%3e%3cpath d='M4 6l4 4 4-4' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
-}
-*/
-
-    /* Focus ring (consistent) */
     select.control-pill:focus {
         outline: none;
         box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.25); /* subtle green ring */
     }
-
     /* Legacy/Edge */
     select.control-pill::-ms-expand {
         display: none;
@@ -509,11 +485,10 @@ select.control-pill,
 small.muted {
     color: hsl(var(--muted-foreground));
 }
-/* ===========================================================
-   MOBILE-RESPONSIVE UTILITIES & TABLE-TO-CARD RULES
-   =========================================================== */
 
-/* Helpers you can apply to any horizontal control bar */
+/* ===========================================================
+   MOBILE-RESPONSIVE UTILITIES
+   =========================================================== */
 .stack-sm {
     display: flex;
     gap: .75rem;
@@ -521,17 +496,16 @@ small.muted {
 
 .w-100-sm {
 }
-/* becomes width:100% on phones below */
+
 .full-btn-sm {
 }
-/* becomes full-width on phones below */
+
 .hide-sm {
 }
-/* hide on phones, show above */
+
 .show-sm {
     display: none;
 }
-/* show on phones via media rule */
 
 /* Tablet & up – keep layout as-is */
 @media (min-width: 577px) {
@@ -571,10 +545,22 @@ small.muted {
         gap: .5rem;
     }
 
-    /* Buttons: keep decent touch targets */
+    /* Buttons: good touch targets */
     .btn-pill {
         height: 40px;
+        border-radius: 12px !important;
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        padding: 0 .9rem;
+        font-weight: 600;
+        font-family: var(--font-display);
     }
+
+        .btn-pill i {
+            font-size: 1rem;
+            margin-right: .25rem;
+        }
 
     /* Tables: smaller cell padding */
     .table-soft thead th,
@@ -591,52 +577,169 @@ small.muted {
     .show-sm {
         display: block !important;
     }
+}
 
-    /* =======================================================
-     TABLE ➜ CARD for .table-soft inside .table-rounded
-     Each <tr> becomes a card; each <td> shows a label from data-label
-     ======================================================= */
+/* =======================================================
+   Phones: TABLE ➜ CARD for .table-soft inside .table-rounded
+   Applies to both Income Sources and Income Records tables
+   ======================================================= */
+@media (max-width: 576px) {
+    /* Hide table header; use td::before as labels */
     .table-rounded .table.table-soft thead {
-        display: none; /* header hidden on phones */
+        display: none;
     }
 
+    /* Each <tr> becomes a card */
     .table-rounded .table.table-soft tbody tr {
-        display: block;
+        display: block; /* keep the card behavior */
         background: hsl(var(--card));
         border: 1px solid hsl(var(--border));
         border-radius: var(--radius);
         box-shadow: var(--shadow-card);
-        padding: .65rem .65rem .5rem;
-        margin-bottom: .65rem;
+        padding: .65rem .65rem .55rem; /* compact bottom */
+        margin: .65rem 0; /* consistent spacing */
     }
 
-        .table-rounded .table.table-soft tbody tr td {
-            display: grid;
-            grid-template-columns: 40% 1fr; /* LABEL  VALUE */
-            gap: .35rem .5rem;
-            padding: .35rem 0 !important;
-            border: none !important;
-            align-items: center;
+        .table-rounded .table.table-soft tbody tr:first-child {
+            margin-top: 0;
         }
 
+        .table-rounded .table.table-soft tbody tr:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Cells inside the card: label/value grid */
+        .table-rounded .table.table-soft tbody tr td {
+            display: grid;
+            grid-template-columns: 40% 1fr; /* LABEL | VALUE */
+            gap: .35rem .5rem;
+            padding: .35rem 0 !important; /* compact inner rows */
+            border: none !important;
+            align-items: center;
+            word-break: break-word; /* avoid horizontal scroll */
+        }
+
+            /* Labels for each cell */
             .table-rounded .table.table-soft tbody tr td::before {
                 content: attr(data-label);
                 color: hsl(var(--muted-foreground));
                 font-weight: 600;
                 font-size: .82rem;
             }
+
+            /* Actions row: keep label left, buttons right */
             .table-rounded .table.table-soft tbody tr td[data-actions="true"] {
-                grid-template-columns: 1fr auto;
+                grid-template-columns: 40% 1fr !important;
             }
 
-    /* Icon buttons hit area */
-    .btn-ghost.btn-sm, .btn.btn-sm {
-        height: 36px;
-        min-width: 36px;
-        border-radius: calc(var(--radius) - 4px);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 .5rem;
+                .table-rounded .table.table-soft tbody tr td[data-actions="true"] .cell-actions {
+                    display: inline-flex;
+                    gap: .5rem;
+                    justify-content: flex-start;
+                    align-items: center;
+                }
+
+    /* Tfoot: show as its own block after cards */
+    .table-rounded .table.table-soft tfoot {
+        display: block;
+        padding: .35rem .65rem .65rem;
     }
+
+        .table-rounded .table.table-soft tfoot tr,
+        .table-rounded .table.table-soft tfoot td,
+        .table-rounded .table.table-soft tfoot th {
+            display: block;
+            border: 0 !important;
+            padding: .15rem 0 !important;
+        }
+}
+
+/* Slight polish on very small phones */
+@media (max-width: 576px) {
+    .btn-ghost.btn-sm i.bi {
+        font-size: 0.95rem;
+        line-height: 1;
+    }
+
+    .panel {
+        margin-bottom: 0.9rem;
+    }
+
+    .panel-header .btn-pill {
+        white-space: nowrap;
+    }
+}
+
+/* ===========================
+   Header: mobile stacking
+   (kept here for clarity)
+   =========================== */
+@media (max-width: 576px) {
+    .panel-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: left;
+    }
+
+        .panel-header .btn-pill {
+            width: 100%;
+            justify-content: center;
+        }
+}
+
+/* ===== Mobile footer total as a compact card ===== */
+@media (max-width: 576px) {
+    /* Turn the footer row into a small card row */
+    .table-rounded .table.table-soft tfoot {
+        display: block;
+        padding: 0; /* let the row handle its own padding */
+        margin: 0;
+    }
+
+        .table-rounded .table.table-soft tfoot tr {
+            display: flex; /* label left, value right */
+            justify-content: space-between;
+            align-items: center;
+            gap: .75rem;
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            padding: .6rem .75rem;
+            margin: .65rem 0 0; /* nice spacing after the last card */
+        }
+
+        /* Normalize footer cells */
+        .table-rounded .table.table-soft tfoot td,
+        .table-rounded .table.table-soft tfoot th {
+            border: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            font-size: 1rem;
+            line-height: 1.25;
+        }
+
+            /* Reset the "text-end" on the label cell for mobile */
+            .table-rounded .table.table-soft tfoot td.text-end {
+                text-align: left !important;
+            }
+
+            /* Label (first cell) */
+            .table-rounded .table.table-soft tfoot td:nth-child(1) {
+                font-weight: 700;
+                color: hsl(var(--foreground));
+                margin:5px 10px;
+            }
+
+            /* Value (second cell) */
+            .table-rounded .table.table-soft tfoot td:nth-child(2) {
+                font-weight: 800;
+                white-space: nowrap; 
+                margin:5px 10px;
+            }
+
+            /* Hide the 3rd cell (empty colSpan) on phones */
+            .table-rounded .table.table-soft tfoot td:nth-child(3) {
+                display: none;
+            }
 }
