@@ -32,16 +32,16 @@ const TitleBar = ({ onLogout, onToggleSidebar }) => {
                 </button>
 
                 <ul className="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <button className="dropdown-item">
-                            <i className="bi bi-person-lines-fill me-2"></i> Profile
-                        </button>
-                    </li>
-                    <li>
-                        <button className="dropdown-item">
-                            <i className="bi bi-gear me-2"></i> Settings
-                        </button>
-                    </li>
+                    {/*<li>*/}
+                    {/*    <button className="dropdown-item">*/}
+                    {/*        <i className="bi bi-person-lines-fill me-2"></i> Profile*/}
+                    {/*    </button>*/}
+                    {/*</li>*/}
+                    {/*<li>*/}
+                    {/*    <button className="dropdown-item">*/}
+                    {/*        <i className="bi bi-gear me-2"></i> Settings*/}
+                    {/*    </button>*/}
+                    {/*</li>*/}
                     <li><hr className="dropdown-divider" /></li>
                     <li>
                         <button className="dropdown-item text-danger" onClick={() => onLogout && onLogout()}>

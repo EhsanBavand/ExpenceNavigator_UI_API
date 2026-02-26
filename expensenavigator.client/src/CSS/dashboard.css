@@ -1,0 +1,277 @@
+/* DashboardPage.css */
+
+/* Base */
+.dashboard-page {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #f6f8fb;
+    min-height: 100vh;
+    color: #0f172a;
+}
+
+-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* Filters / Panel */
+.dashboard-panel {
+    background: transparent;
+    border: 0;
+    margin-bottom: 12px;
+}
+
+    .dashboard-panel .panel-body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: end;
+        padding: 0;
+    }
+
+.dashboard-filter-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.dashboard-filter {
+    min-width: 160px;
+}
+
+.dashboard-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Cards grid */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.dashboard-card {
+    border-radius: 16px;
+    padding: 16px;
+    color: #fff;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 6px 12px rgba(16,24,40,0.06);
+}
+
+    .dashboard-card .subtitle {
+        font-size: 12px;
+        opacity: 0.95;
+    }
+
+    .dashboard-card .amount {
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+/* Chart wrapper */
+.card-surface {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 6px 12px rgba(16,24,40,0.06);
+}
+
+.chart-title {
+    margin-bottom: 16px;
+}
+
+/* Gradients (kept as utility classes to avoid inline styles) */
+.grad-income {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+}
+
+.grad-budget {
+    background: linear-gradient(135deg, #a78bfa 0%, #6366f1 100%);
+}
+
+.grad-expenses {
+    background: linear-gradient(135deg, #f87171 0%, #fb7185 100%);
+}
+
+.grad-incomeLeft {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.grad-budgetLeft {
+    background: linear-gradient(135deg, #7dd3fc 0%, #6366f1 100%);
+}
+
+/* ------------------------- */
+/*        RESPONSIVE         */
+/* ------------------------- */
+
+/* <= 1200px */
+@media (max-width: 1200px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Tablets: <= 992px */
+@media (max-width: 992px) {
+    .dashboard-container {
+        padding: 16px;
+    }
+
+    .dashboard-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-card .amount {
+        font-size: 24px;
+    }
+
+    .chart-title {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+}
+
+/* Large phones: <= 768px */
+@media (max-width: 768px) {
+    .dashboard-panel .panel-body {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dashboard-filter-group {
+        flex-direction: column;
+    }
+
+    .dashboard-filter {
+        width: 100%;
+    }
+
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-card {
+        padding: 14px;
+    }
+
+        .dashboard-card .subtitle {
+            font-size: 11px;
+        }
+
+        .dashboard-card .amount {
+            font-size: 22px;
+        }
+
+    .card-surface {
+        padding: 14px;
+    }
+}
+
+/* Small phones: <= 480px */
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 12px;
+    }
+
+    .dashboard-card {
+        border-radius: 12px;
+    }
+
+        .dashboard-card .amount {
+            font-size: 20px;
+        }
+
+    .chart-title {
+        font-size: 0.95rem;
+    }
+}
+
+.chart-scroll-x {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+    .chart-scroll-x::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .chart-scroll-x::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+@media (max-width: 768px) {
+    .chart-scroll-y {
+        max-height: 320px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+.panel-body.filter-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: end;
+}
+
+@media (max-width: 768px) {
+    .filter-item {
+        width: 100%;
+    }
+
+        .filter-item select,
+        .filter-item button {
+            width: 100%;
+        }
+}
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+}
+.chart-scroll-y {
+    max-height: 420px; /* adjust as needed */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+    .chart-scroll-y {
+        max-height: 320px;
+    }
+}

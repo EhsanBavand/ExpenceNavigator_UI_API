@@ -69,7 +69,7 @@ h1, h2, h3, h4, h5 {
 
 /* Page title + very light underline */
 .page-title {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
     margin: 0 0 .5rem;
 }
@@ -100,7 +100,7 @@ h1, h2, h3, h4, h5 {
 
 .panel-header-title {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 500;
     font-size: 1rem;
     margin: 0;
 }
@@ -125,7 +125,7 @@ h1, h2, h3, h4, h5 {
 
     .toolbar .form-label {
         margin-bottom: .35rem;
-        font-weight: 600;
+        font-weight: 400;
         color: hsl(var(--foreground));
     }
 
@@ -340,7 +340,7 @@ h1, h2, h3, h4, h5 {
     justify-content: center;
     background: hsl(var(--sidebar-accent));
     color: hsl(var(--sidebar-accent-foreground));
-    font-size: 14px;
+    font-size: 12px;
     transition: background-color .2s ease, color .2s ease;
 }
 
@@ -438,8 +438,9 @@ select.control-pill,
     justify-content: center;
     background: hsl(var(--accent));
     color: hsl(var(--accent-foreground));
-    font-size: 18px;
-}
+    font-size: 16px;
+/*    border: 2px solid red !important;
+*/}
 
 .actions {
     display: inline-flex;
@@ -466,7 +467,7 @@ select.control-pill,
 
 .saving-card .value {
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 /* Progress bar */
@@ -792,9 +793,9 @@ small.muted {
     }
 
     .kpi-card .kpi-value {
-        font-weight: 800;
-        font-size: 1.75rem;
-        line-height: 1.1;
+        font-weight: 500;
+        font-size: 1rem;
+        line-height: normal;
     }
 
     .kpi-card .kpi-sub {
@@ -854,7 +855,7 @@ small.muted {
         text-align: left;
     }
 
-        .panel-header .btn-pill {
+        . -header .btn-pill {
             width: 100%;
             justify-content: center;
         }
@@ -969,3 +970,9 @@ small.muted {
         font-size: .84rem;
     }
 }
+
+.recharts-wrapper svg:focus,
+.recharts-wrapper svg *:focus {
+    outline: none !important;
+}
+
