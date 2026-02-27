@@ -510,6 +510,7 @@ const SavingPage = () => {
                                                 value={mTarget}
                                                 onChange={(e) => setMTarget(e.target.value)}
                                                 placeholder="e.g., 10000"
+                                                required
                                             />
                                         </div>
                                         <div className="mb-3">
@@ -517,7 +518,7 @@ const SavingPage = () => {
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                value={mAmount}
+                                                value={mAmount ?? 0}
                                                 onChange={(e) => setMAmount(e.target.value)}
                                                 placeholder="e.g., 500"
                                             />
@@ -585,8 +586,9 @@ const SavingPage = () => {
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                value={eTarget ?? ""}
+                                                value={eTarget ?? "" }
                                                 onChange={(e) => setETarget(e.target.value)}
+                                                required
                                             />
                                         </div>
                                         <div className="mb-3">
@@ -594,7 +596,7 @@ const SavingPage = () => {
                                             <input
                                                 type="number"
                                                 className="form-control"
-                                                value={eAmount ?? ""}
+                                                value={eAmount ?? 0}
                                                 onChange={(e) => setEAmount(e.target.value)}
                                             />
                                         </div>
