@@ -213,3 +213,91 @@
     font-size: 14px;
     margin-top: 10px;
 }
+
+.forgot-link {
+    cursor: pointer;
+    font-size: 13px;
+    color: #512da8;
+    margin-top: 5px;
+}
+
+    .forgot-link:hover {
+        text-decoration: underline;
+    }
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    font-family: "Montserrat",sans-serif;
+}
+
+.auth-card {
+    background: white;
+    padding: 40px;
+    width: 400px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+    .auth-card h2 {
+        margin-bottom: 10px;
+    }
+
+.subtitle {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.auth-card form {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-card input {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.auth-card button {
+    background: #512da8;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+    .auth-card button:hover {
+        background: #3f1f88;
+    }
+
+.back-link {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #512da8;
+    cursor: pointer;
+}
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+.error-text {
+    color: #dc3545;
+    margin-top: 10px;
+}
+
+.success-text {
+    color: #28a745;
+    margin-top: 10px;
+}

@@ -1,4 +1,5 @@
 ﻿using ExpenseNavigator.Interfaces;
+using ExpenseNavigator.Server.Models;
 using ExpenseNavigatorAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -33,6 +34,26 @@ namespace ExpenseNavigator.Controllers
                 return BadRequest(new { message = result.Message });
 
             return Ok(result); 
+        }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            var result = await _authService.ForgotPasswordAsync(model.Email);
+
+            if (!result.IsAuthenticated)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(result);
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            var result = await _authService.ResetPasswordAsync(model);
+
+            if (!result.IsAuthenticated)
+                return BadRequest(new { message = result.Message });
+
+            return Ok(new { message = result.Message });
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using ExpenseNavigatorAPI.Models;
+﻿using ExpenseNavigator.Server.Models;
+using ExpenseNavigatorAPI.Models;
 
 namespace ExpenseNavigator.Interfaces
 {
@@ -6,5 +7,7 @@ namespace ExpenseNavigator.Interfaces
     {
         Task<AuthResponse> RegisterAsync(RegisterModel model);
         Task<AuthResponse> LoginAsync(LoginModel model);
+        Task<AuthResponse> ForgotPasswordAsync(string email);
+        Task<AuthResponse> ResetPasswordAsync(ResetPasswordModel model);
     }
 }
