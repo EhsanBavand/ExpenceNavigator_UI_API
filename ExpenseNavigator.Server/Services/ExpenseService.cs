@@ -27,7 +27,7 @@ namespace ExpenseNavigatorAPI.Services
                 var query = _context.Expenses
                     .AsNoTracking()
                     .Where(e => e.UserId == userId && e.Month == month && e.Year == year)
-                    .OrderBy(e => e.Date);
+                    .OrderByDescending(e => e.Date);
                 results = await query.ToListAsync();
                 return results;
             }
