@@ -24,18 +24,15 @@ namespace ExpenseNavigator.Services
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
-
         public AuthService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
-
         public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
         }
-
         public async Task<AuthResponse> RegisterAsync(RegisterModel model)
         {
             try
@@ -72,7 +69,6 @@ namespace ExpenseNavigator.Services
                 };
             }
         }
-
         public async Task<AuthResponse> LoginAsync(LoginModel model)
         {
             try
@@ -209,9 +205,9 @@ namespace ExpenseNavigator.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),               
-                new Claim(ClaimTypes.NameIdentifier, user.Id),                 
-                new Claim(ClaimTypes.Name, user.UserName),                     
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email)
             };
 

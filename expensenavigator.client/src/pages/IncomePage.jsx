@@ -120,6 +120,7 @@ const IncomePage = () => {
             try {
                 const r = await getIncomesByMonth(userId, selectedMonth, selectedYear);
                 setIncomeList(r.data);
+                console.log(r.data)
                 setError(null);
             } catch (e) {
                 console.error(e);
@@ -489,6 +490,7 @@ const IncomePage = () => {
                                 <thead>
                                     <tr>
                                         <th>Source</th>
+                                        <th>Owner</th>
                                         <th>Amount</th>
                                         <th>Date</th>
                                         <th>Note</th>
@@ -508,6 +510,7 @@ const IncomePage = () => {
                                                     {i.isRecurring && <span className="badge-soft success">Monthly</span>}
                                                     {i.sourceType}
                                                 </td>
+                                                <td data-label="Owner" className="fw-bold text-success">{i.owner}</td>
                                                 <td data-label="Amount" className="fw-bold text-success">{currency(i.amount)}</td>
                                                 <td data-label="Date">{prettyDate(i.date)}</td>
                                                 <td data-label="Note" className="text-muted">{i.description}</td>
@@ -539,8 +542,8 @@ const IncomePage = () => {
 
                                 {incomeList.length > 0 && (
                                     <tfoot>
-                                        <tr>
-                                            <td className="text-end fw-bold">Total:</td>
+                                            <tr>
+                                                <td className="text-end fw-bold" colSpan="2">Total:</td>
                                             <td className="fw-bold text-success">{currency(totalIncome)}</td>
                                             <td colSpan="3"></td>
                                         </tr>

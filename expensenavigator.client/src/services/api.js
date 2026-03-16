@@ -158,8 +158,6 @@ export async function deleteSource(id) {
     }
 }
 
-/* Expense Page */
-
 // =====================
 // Categories API
 // =====================
@@ -332,6 +330,7 @@ export const getExpenses = async (userId, month, year, opts = {}) => {
         `${API_BASE_URL}/Expense/${userId}/${month}/${year}`,
         { signal: opts.signal, timeout: 15000 },
     );
+    console.log("Expense in API: " + res.data);
     return res.data;
 };
 export const getExpenseById = async (id) => {

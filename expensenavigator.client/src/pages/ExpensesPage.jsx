@@ -106,14 +106,39 @@ export default function ExpenseManager() {
         categories.forEach((c) => { map[c.catId] = c.name; });
         return map;
     }, [categories]);
+    const subCategoryMap = React.useMemo(() => {
+        const map = {};
 
-    const sortedExpenses = React.useMemo(() => {
-        return [...expenses].sort((a, b) => {
-            const catA = categoryMap[a.categoryId] || "";
-            const catB = categoryMap[b.categoryId] || "";
-            return catA.localeCompare(catB);
+        subCategories.forEach(sc => {
+            map[sc.id] = sc.name;
         });
-    }, [expenses, categoryMap]);
+
+        return map;
+
+    }, [subCategories]);
+
+
+    const placeMap = React.useMemo(() => {
+        const map = {};
+
+        places.forEach(p => {
+            map[p.id] = p.name;
+        });
+
+        return map;
+
+    }, [places]);
+
+    //const sortedExpenses = React.useMemo(() => {
+    //    return [...expenses].sort((a, b) => {
+    //        const catA = categoryMap[a.categoryId] || "";
+    //        const catB = categoryMap[b.categoryId] || "";
+    //        return catA.localeCompare(catB);
+    //    });
+    //}, [expenses, categoryMap]);
+    const expenseList = expenses; // no sorting
+    console.log("Expenses data:", expenseList);
+
 
     const [summary, setSummary] = useState({
         totalIncome: 0,
@@ -137,7 +162,7 @@ export default function ExpenseManager() {
         toMonth: selectedMonth,
         toYear: selectedYear,
     });
-    const hasDataToCopy = sortedExpenses.length > 0;
+    const hasDataToCopy = expenseList.length > 0;
     const [copyMessage, setCopyMessage] = useState("");
 
     const [showCopyCategoryBudgetModal, setShowCopyCategoryBudgetModal] = useState(false);
@@ -558,11 +583,7 @@ export default function ExpenseManager() {
         });
         setEditExpenseModalOpen(true);
     };
-
-    const getCategoryName = (id) => categories.find((c) => c.catId === id)?.name || "";
-    const getSubCategoryName = (id) => subCategories.find((sc) => sc.id === id)?.name || "";
-    const getPlaceName = (id) => places.find((p) => p.id === id)?.name || "";
-
+     
     // ======= Render =======
     return (
         <div className="container mt-4" style={{ margin: "auto" }}>
@@ -1083,14 +1104,14 @@ export default function ExpenseManager() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {sortedExpenses.map((exp) => (
+                                    {expenseList.map((exp) => (
                                         <tr key={exp.id}>
                                             <td data-label="Date" className="text-nowrap text-muted">
                                                 {exp.date?.split("T")[0]}
                                             </td>
-                                            <td data-label="Category">{getCategoryName(exp.categoryId)}</td>
-                                            <td data-label="SubCategory">{getSubCategoryName(exp.subCategoryId)}</td>
-                                            <td data-label="Place">{getPlaceName(exp.placeId)}</td>
+                                            <td data-label="Category">{categoryMap[exp.categoryId] || ""}</td>
+                                            <td data-label="SubCategory">{subCategoryMap[exp.subCategoryId] || ""}</td>
+                                            <td data-label="Place">{placeMap[exp.placeId] || ""}</td>
                                             <td data-label="Amount" className="fw-semibold">{currency(exp.amount)}</td>
                                             <td data-label="Paid For">{exp.paidFor}</td>
                                             <td data-label="Item" className="text-truncate" style={{ maxWidth: "140px" }} title={exp.itemName}>
