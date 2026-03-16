@@ -151,7 +151,7 @@ export default function ExpenseManager() {
     const [categorySort, setCategorySort] = useState({ field: "name", asc: true });
     const [subCatSort, setSubCatSort] = useState({ field: "name", asc: true });
     const [placeSort, setPlaceSort] = useState({ field: "name", asc: true });
-    const [expenseSort, setExpenseSort] = useState({ field: "date", asc: true });
+    //const [expenseSort, setExpenseSort] = useState({ field: "date", asc: true });
 
     const [showGenerateModal, setShowGenerateExpenseModal] = useState(false);
     const [generateRange, setGenerateRange] = useState({
@@ -556,9 +556,9 @@ export default function ExpenseManager() {
         return placeSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
 
-    const toggleExpenseSort = (field) => {
-        setExpenseSort((prev) => (prev.field === field ? { field, asc: !prev.asc } : { field, asc: true }));
-    };
+    //const toggleExpenseSort = (field) => {
+    //    setExpenseSort((prev) => (prev.field === field ? { field, asc: !prev.asc } : { field, asc: true }));
+    //};
 
     const handleSearchByMonth = () => {
         if (!userId) return;
@@ -1079,27 +1079,32 @@ export default function ExpenseManager() {
                             <table className="table table-soft table-hover align-middle mb-0" style={{ fontSize: "0.95rem" }}>
                                 <thead>
                                     <tr>
-                                        <th style={{ width: "120px", cursor: "pointer" }}
-                                            onClick={() => setExpenseSort({ field: "date", asc: !expenseSort.asc })}>
-                                            Date
-                                        </th>
-                                        <th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "category", asc: !expenseSort.asc })}>
-                                            Category
-                                        </th>
-                                        <th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "subCategory", asc: !expenseSort.asc })}>
-                                            SubCategory
-                                        </th>
-                                        <th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "place", asc: !expenseSort.asc })}>
-                                            Place
-                                        </th>
+                                        {/*<th style={{ width: "120px", cursor: "pointer" }}*/}
+                                        {/*    onClick={() => setExpenseSort({ field: "date", asc: !expenseSort.asc })}>*/}
+                                        {/*    Date*/}
+                                        {/*</th>*/}
+                                        {/*<th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "category", asc: !expenseSort.asc })}>*/}
+                                        {/*    Category*/}
+                                        {/*</th>*/}
+                                        {/*<th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "subCategory", asc: !expenseSort.asc })}>*/}
+                                        {/*    SubCategory*/}
+                                        {/*</th>*/}
+                                        {/*<th style={{ cursor: "pointer" }} onClick={() => setExpenseSort({ field: "place", asc: !expenseSort.asc })}>*/}
+                                        {/*    Place*/}
+                                        {/*</th>*/}
+                                        <th>Date</th>
+                                        <th>Category</th>
+                                        <th>SubCategory</th>
+                                        <th>Place</th>
                                         <th className="text-truncate" style={{ width: "100px" }}>Amount</th>
                                         <th style={{ width: "120px" }}>Paid For</th>
                                         <th style={{ width: "140px" }}>Item</th>
                                         <th style={{ width: "180px" }}>Note</th>
-                                        <th style={{ width: "80px", cursor: "pointer" }}
-                                            onClick={() => toggleExpenseSort("isFixed")}>
-                                            Fixed
-                                        </th>
+                                        {/*<th style={{ width: "80px", cursor: "pointer" }}*/}
+                                        {/*    onClick={() => toggleExpenseSort("isFixed")}>*/}
+                                        {/*    Fixed*/}
+                                        {/*</th>*/}
+                                        <th style={{ width: "80px", cursor: "pointer" }}>Fixed</th>
                                         <th className="text-center" style={{ width: "80px" }}>Actions</th>
                                     </tr>
                                 </thead>
@@ -1145,7 +1150,12 @@ export default function ExpenseManager() {
                                             </td>
                                         </tr>
                                     ))}
-                                    {sortedExpenses.length === 0 && (
+                                    {/*{sortedExpenses.length === 0 && (*/}
+                                    {/*    <tr>*/}
+                                    {/*        <td colSpan={10} className="text-center text-muted py-4">No expenses found</td>*/}
+                                    {/*    </tr>*/}
+                                    {/*)}*/}
+                                    {expenseList.length === 0 && (
                                         <tr>
                                             <td colSpan={10} className="text-center text-muted py-4">No expenses found</td>
                                         </tr>
