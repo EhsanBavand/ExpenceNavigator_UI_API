@@ -31,7 +31,7 @@
     height: 400px;
 }
 
-.skeleton-line {
+/*.skeleton-line {
     height: 14px;
     margin: 6px 0;
 }
@@ -49,5 +49,35 @@
     .skeleton-line.lg {
         height: 16px;
         width: 40%;
+    }*/
+
+/* Responsive Tab Buttons */ /* grow to full width on mobile */
+@media (max-width: 576px) {
+    .tab-buttons button {
+        flex: 1 1 100%;
     }
+}
+
+/*.tab-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}*/
+/* =============================== */
+/* Responsive Tab Buttons (GLOBAL) */
+/* =============================== */
+
+.tab-buttons-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Stack full-width on phones */
+@media (max-width: 576px) {
+    .tab-buttons-responsive button {
+        flex: 1 1 100%;
+        width: 100%;
+    }
+}
 

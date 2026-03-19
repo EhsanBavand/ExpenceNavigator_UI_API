@@ -59,6 +59,16 @@ const Sidebar = ({ isOpen, onToggle, isDesktop }) => {
                                 <span>Expenses</span>
                             </NavLink>
                         </li>
+                        {/*<li>*/}
+                        {/*    <NavLink*/}
+                        {/*        to="/expenses2"*/}
+                        {/*        className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}*/}
+                        {/*        onClick={handleItemClick}*/}
+                        {/*    >*/}
+                        {/*        <span className="sidebar-icon"><i className="bi bi-cart-check-fill" /></span>*/}
+                        {/*        <span>Expenses 2</span>*/}
+                        {/*    </NavLink>*/}
+                        {/*</li>*/}
                         <li>
                             <NavLink
                                 to="/saving"

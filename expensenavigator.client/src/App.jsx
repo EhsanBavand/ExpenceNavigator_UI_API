@@ -1,6 +1,3 @@
-// src/App.jsx
-
-// src/App.jsx
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./CSS/Layout.css";
 import "./CSS/Sidebar.css";

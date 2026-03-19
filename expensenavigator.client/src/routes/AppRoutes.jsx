@@ -8,6 +8,7 @@ import SavingPage from "../pages/SavingPage";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Layout from "../components/Layout";
+import ExpensesPage2 from "../pages/ExpensePage2";
 
 /* ================= PROTECTED ROUTE ================= */
 const ProtectedRoute = ({ children }) => {
@@ -81,6 +82,17 @@ const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             />
+
+            {/*<Route*/}
+            {/*    path="/expenses2"*/}
+            {/*    element={*/}
+            {/*        <ProtectedRoute>*/}
+            {/*            <Layout onLogout={handleLogout}>*/}
+            {/*                <ExpensesPage2 />*/}
+            {/*            </Layout>*/}
+            {/*        </ProtectedRoute>*/}
+            {/*    }*/}
+            {/*/>*/}
 
             <Route
                 path="/saving"

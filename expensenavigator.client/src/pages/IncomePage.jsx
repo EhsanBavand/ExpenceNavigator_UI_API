@@ -542,8 +542,8 @@ const IncomePage = () => {
 
                                 {incomeList.length > 0 && (
                                     <tfoot>
-                                            <tr>
-                                                <td className="text-end fw-bold" colSpan="2">Total:</td>
+                                        <tr>
+                                            <td className="text-end fw-bold" colSpan="2">Total:</td>
                                             <td className="fw-bold text-success">{currency(totalIncome)}</td>
                                             <td colSpan="3"></td>
                                         </tr>
@@ -568,22 +568,26 @@ const IncomePage = () => {
                     <Button variant="danger" onClick={handleDeleteConfirmed}>Delete</Button>
                 </Modal.Footer>
             </Modal>
-
-            {/* Add/Edit Source */}
             <Modal show={showSourceModal} onHide={() => setShowSourceModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{sourceFormData.id ? "Edit Source" : "Add Source"}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <Form>
+
+                <Form onSubmit={handleSaveSource}>
+                    <Modal.Body>
                         <Form.Group className="mb-3">
-                            <Form.Label>Source Type</Form.Label>
+                            <Form.Label>
+                                Source Type <span style={{ color: "red" }}>*</span>
+                            </Form.Label>
+
                             <Form.Control
                                 type="text"
                                 value={sourceFormData.sourceType}
                                 onChange={(e) => setSourceFormData((p) => ({ ...p, sourceType: e.target.value }))}
+                                required
                             />
                         </Form.Group>
+
                         <Form.Group>
                             <Form.Label>Description</Form.Label>
                             <Form.Control
@@ -592,13 +596,21 @@ const IncomePage = () => {
                                 onChange={(e) => setSourceFormData((p) => ({ ...p, description: e.target.value }))}
                             />
                         </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowSourceModal(false)}>Cancel</Button>
-                    <Button variant="primary" onClick={handleSaveSource}>Save</Button>
-                </Modal.Footer>
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowSourceModal(false)}>
+                            Cancel
+                        </Button>
+
+                        <Button variant="primary" type="submit">
+                            Save
+                        </Button>
+                    </Modal.Footer>
+                </Form>
             </Modal>
+
+
 
             {/* Add/Edit Income */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
@@ -608,12 +620,12 @@ const IncomePage = () => {
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Group className="mb-3">
-                            <Form.Label>Owner</Form.Label>
+                            <Form.Label>Owner <span style={{ color: "red" }}>*</span></Form.Label>
                             <Form.Control name="owner" value={formData.owner} onChange={handleFormChange} required />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Source Type</Form.Label>
+                            <Form.Label>Source Type <span style={{ color: "red" }}>*</span></Form.Label>
                             <Form.Select
                                 name="incomeSourceId"
                                 value={formData.incomeSourceId}
@@ -628,7 +640,7 @@ const IncomePage = () => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Amount</Form.Label>
+                            <Form.Label>Amount <span style={{ color: "red" }}>*</span></Form.Label>
                             <Form.Control
                                 name="amount" type="number" step="0.01" min="0"
                                 value={formData.amount} onChange={handleFormChange} required
@@ -636,21 +648,32 @@ const IncomePage = () => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Date</Form.Label>
+                            <Form.Label>Date <span style={{ color: "red" }}>*</span></Form.Label>
                             <Form.Control name="date" type="date" value={formData.date} onChange={handleFormChange} required />
                         </Form.Group>
 
-                        <Form.Select className="mb-3" name="frequency" value={formData.frequency} onChange={handleFormChange} required>
-                            <option value="" disabled>Choose recurrence</option>
-                            <option value="None">One-time</option>
-                            <option value="Weekly">Weekly</option>
-                            <option value="ByWeekly">By Weekly</option>
-                            <option value="Monthly">Monthly</option>
-                            <option value="Yearly">Yearly</option>
-                        </Form.Select>
+                        <Form.Group className="mb-3">
+                            <Form.Label>
+                                Recurrence <span className="text-danger">*</span>
+                            </Form.Label>
+
+                            <Form.Select
+                                name="frequency"
+                                value={formData.frequency}
+                                onChange={handleFormChange}
+                                required
+                            >
+                                <option value="" disabled>Choose recurrence</option>
+                                <option value="None">One-time</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="ByWeekly">Bi-weekly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Yearly">Yearly</option>
+                            </Form.Select>
+                        </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Month</Form.Label>
+                            <Form.Label>Month <span style={{ color: "red" }}>*</span></Form.Label>
                             <Form.Select name="month" value={formData.month} onChange={handleFormChange} required>
                                 <option value="">Choose month</option>
                                 {monthNames.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
@@ -658,12 +681,12 @@ const IncomePage = () => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Year</Form.Label>
+                            <Form.Label>Year <span style={{ color: "red" }}>*</span></Form.Label>
                             <Form.Control name="year" type="number" min="2000" value={formData.year} onChange={handleFormChange} required />
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Check type="checkbox" label="Is Recurring?" name="isRecurring" checked={formData.isRecurring} onChange={handleFormChange} />
+                            <Form.Check type="checkbox" label="Repeat next month" name="isRecurring" checked={formData.isRecurring} onChange={handleFormChange} />
                         </Form.Group>
 
                         <Form.Group className="mb-3">

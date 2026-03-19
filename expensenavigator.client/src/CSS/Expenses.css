@@ -1,0 +1,261 @@
+/* ============================================
+-soft {   GENERAL PANEL + LAYOUT
+    border: none;
+}
+
+.table-soft th {
+    background: #fafafa;
+    border-bottom: 2px solid #eee;
+}
+
+.table-soft td {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ============================================
+   PAGE TITLE
+   ============================================ */
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.page-header-line {
+    height: 2px;
+    width: 100%;
+    background: #eaeaea;
+    margin-bottom: 20px;
+}
+
+============================================ */
+.panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.panel-header {
+    border-bottom: 1px solid #eee;
+    padding: 14px 18px;
+    background: #fafafa;
+}
+
+.panel-header-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.panel-body {
+    padding: 18px;
+}
+
+/* ============================================
+   KPI CARD STYLING
+   ============================================ */
+.kpi-grid {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.kpi-card {
+    position: relative;
+    color: #fff;
+    padding: 18px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.kpi-title {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.kpi-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 3px;
+}
+
+.kpi-sub {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.kpi-icon {
+    position: absolute;
+    right: 14px;
+    bottom: 14px;
+    font-size: 1.6rem;
+    opacity: 0.4;
+}
+
+.kpi--income {
+    background: linear-gradient(135deg, #23c06a, #1b9f58);
+}
+
+.kpi--budget {
+    background: linear-gradient(135deg, #8c52ff, #6a32d9);
+}
+
+.kpi--remaining {
+    background: linear-gradient(135deg, #3f82ff, #2c62d6);
+}
+
+.kpi--expense {
+    background: linear-gradient(135deg, #ff4f4f, #e63838);
+}
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+.btn-pill {
+    border-radius: 30px !important;
+    padding: 7px 18px !important;
+    font-size: 0.9rem !important;
+}
+
+.btn-green {
+    background: #28a745 !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-blue {
+    background: #0d6efd !important;
+    border: none !important;
+    color: white !important;
+}
+
+/*.btn-ghost {
+    background: #f2f2f2 !important;
+    color: #444 !important;
+    border: none !important;
+}*/
+.btn-ghost {
+    background-color: hsl(var(--secondary)) !important;
+    color: hsl(var(--secondary-foreground)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+}
+
+    .btn-ghost:hover {
+        background-color: hsl(var(--accent)) !important;
+    }
+
+/* ============================================
+   INPUT PILL
+   ============================================ */
+.control-pill {
+    border-radius: 30px !important;
+    padding-left: 12px !important;
+    height: 38px !important;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+.stack-sm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.w-100-sm {
+    width: auto;
+}
+
+@media (max-width: 768px) {
+    .w-100-sm {
+        width: 100% !important;
+    }
+
+    .full-btn-sm {
+        width: 100% !important;
+    }
+}
+
+/* ============================================
+   TABLE STYLE
+   ============================================ */
+.table-rounded {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-soft tbody tr:hover {
+    background: #fafafa;
+}
+
+/* ---------------------------
+   EXPENSE TABLE IMPROVEMENTS
+   --------------------------- */
+
+/* Larger date column */
+/* Keep action buttons in one row */
+.expense-actions {
+    white-space: nowrap;
+    width: 90px; /* prevents wrapping */
+}
+
+.expense-date {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Larger category column */
+.expense-category {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #222;
+}
+
+/* Note column smaller with ellipsis */
+.expense-note {
+    max-width: 140px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* Icon-only action buttons */
+.btn-action-icon {
+    /*
+        background: transparent !important;
+        border: none !important;
+        padding: 4px 6px !important;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.15s ease-in-out;
+
+    */
+
+    background: #f6f6f6 !important;
+    padding: 2px 4px !important;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.15s ease-in-out;
+    border: 1px solid darkgray;
+    margin: 0px 2px;
+}
+
+    .btn-action-icon:hover {
+        background: #f0f0f0;
+    }
+
+    .btn-action-icon i {
+        font-size: 1.1rem;
+    }
+
+.icon-edit {
+    color: #63666a;
+}
+
+.icon-delete {
+    color: #dc3545;
+}
