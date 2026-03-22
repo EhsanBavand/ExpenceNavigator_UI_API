@@ -12,6 +12,7 @@ import { ExpenseTable } from "../components/Expenses/ExpenseTable";
 import { CategoryTable } from "../components/Expenses/CategoryTable";
 import { SubCategoryTable } from "../components/Expenses/SubCategoryTable";
 import { PlaceTable } from "../components/Expenses/PlaceTable";
+import { EditExpenseModal } from "../components/Expenses/EditExpenseModal";
 
 // ===== API SERVICES =====
 import {
@@ -23,6 +24,7 @@ import {
     createSubCategory,
     createPlace,
     createExpense,
+    updateExpense,
     deleteCategory,
     deleteSubCategory,
     deletePlace,
@@ -52,9 +54,9 @@ export default function ExpensesPage() {
 
     const [expenseForm, setExpenseForm] = useState({
         date: "",
-        category: "",
-        subCategory: "",
-        place: "",
+        categoryId: "",
+        subCategoryId: "",
+        placeId: "",
         amount: "",
         paidFor: "",
         itemName: "",
@@ -82,7 +84,10 @@ export default function ExpensesPage() {
         remainingIncome: 0,
         remainingBudget: 0,
     });
-    // Open modal
+
+    // ===== EDIT MODAL =====
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editForm, setEditForm] = useState({});
 
     // ===== LOAD USER =====
     useEffect(() => {
@@ -121,9 +126,6 @@ export default function ExpensesPage() {
             const dash = await getDashboardSummary(userId, selectedMonth, selectedYear);
             setSummary(dash);
 
-            console.log("CATEGORIES:", categories);
-            console.log("SUBCATEGORIES:", subCategories);
-
         } catch (err) {
             console.error(err);
         }
@@ -161,11 +163,10 @@ export default function ExpensesPage() {
         e.preventDefault();
         await createSubCategory({
             name: subCategoryName,
-            categoryId: selectedCategory, 
+            categoryId: selectedCategory,
             userId,
             isRecurring: true,
         });
-
         setSubCategoryName("");
         setSelectedCategory("");
         fetchAll();
@@ -191,9 +192,9 @@ export default function ExpensesPage() {
         await createExpense({
             userId,
             date: expenseForm.date,
-            categoryId: expenseForm.category,
-            subCategoryId: expenseForm.subCategory,
-            placeId: expenseForm.place,
+            categoryId: expenseForm.categoryId || null,
+            subCategoryId: expenseForm.subCategoryId || null,
+            placeId: expenseForm.placeId || null,
             amount: Number(expenseForm.amount),
             paidFor: expenseForm.paidFor,
             itemName: expenseForm.itemName,
@@ -205,9 +206,9 @@ export default function ExpensesPage() {
 
         setExpenseForm({
             date: "",
-            category: "",
-            subCategory: "",
-            place: "",
+            categoryId: "",
+            subCategoryId: "",
+            placeId: "",
             amount: "",
             paidFor: "",
             itemName: "",
@@ -232,7 +233,47 @@ export default function ExpensesPage() {
         if (type === "category") await deleteCategory(id, userId, selectedMonth, selectedYear);
         if (type === "subCategory") await deleteSubCategory(id);
         if (type === "place") await deletePlace(id);
+        fetchAll();
+    };
 
+    // ===== EDIT EXPENSE =====
+    const handleEditChange = (field, value) => {
+        setEditForm((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleEditExpense = (expense) => {
+        setEditForm({
+            id: expense.id,
+            date: expense.date?.split("T")[0],
+            categoryId: expense.categoryId || "",
+            subCategoryId: expense.subCategoryId || "",
+            placeId: expense.placeId || "",
+            amount: expense.amount,
+            paidFor: expense.paidFor,
+            itemName: expense.itemName,
+            note: expense.note,
+            isFixed: expense.isFixed,
+        });
+        setShowEditModal(true);
+    };
+
+    const handleEditSubmit = async () => {
+        const [y, m] = editForm.date.split("-");
+        await updateExpense(editForm.id, {
+            userId,
+            date: editForm.date,
+            categoryId: editForm.categoryId || null,
+            subCategoryId: editForm.subCategoryId || null,
+            placeId: editForm.placeId || null,
+            amount: Number(editForm.amount),
+            paidFor: editForm.paidFor,
+            itemName: editForm.itemName,
+            note: editForm.note,
+            isFixed: editForm.isFixed,
+            year: Number(y),
+            month: Number(m),
+        });
+        setShowEditModal(false);
         fetchAll();
     };
 
@@ -252,10 +293,8 @@ export default function ExpensesPage() {
                                 value={uiMonth}
                                 onChange={(e) => setUiMonth(Number(e.target.value))}
                             >
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
-                                    <option key={m} value={m}>
-                                        {m}
-                                    </option>
+                                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                                    <option key={m} value={m}>{m}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
@@ -268,13 +307,10 @@ export default function ExpensesPage() {
                                 onChange={(e) => setUiYear(Number(e.target.value))}
                             >
                                 {[selectedYear, selectedYear - 1, selectedYear - 2].map((y) => (
-                                    <option key={y} value={y}>
-                                        {y}
-                                    </option>
+                                    <option key={y} value={y}>{y}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
-
                         <Button
                             className="btn-pill btn-green full-btn-sm"
                             onClick={() => {
@@ -289,7 +325,7 @@ export default function ExpensesPage() {
                 </div>
             </div>
 
-            {/* ===== KPI CARDS ===== */}
+            {/* KPI CARDS */}
             <div className="panel">
                 <div className="panel-body">
                     <div className="kpi-grid mb-3">
@@ -438,9 +474,21 @@ export default function ExpensesPage() {
                             subCategoryMap={subCategoryMap}
                             placeMap={placeMap}
                             currency={currency}
+                            onEdit={handleEditExpense}
                             onDelete={(id) => handleDelete(id, "expense")}
                         />
                     )}
+
+                    <EditExpenseModal
+                        show={showEditModal}
+                        onClose={() => setShowEditModal(false)}
+                        form={editForm}
+                        categories={categories}
+                        subCategories={subCategories}
+                        places={places}
+                        onChange={handleEditChange}
+                        onSubmit={handleEditSubmit}
+                    />
                 </div>
             </div>
         </div>

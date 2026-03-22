@@ -223,7 +223,7 @@ export const getSubCategoriesByCategory = async (categoryId) => {
 };
 export const getSubCategories = async (userId) => {
     const res = await axios.get(`${API_BASE_URL}/SubCategory?userId=${userId}`);
-    console.log("res subcategory:", res);
+    //console.log("res subcategory:", res);
     return res.data;
 };
 export const createSubCategory = async (subCategory) => {
@@ -330,7 +330,7 @@ export const getExpenses = async (userId, month, year, opts = {}) => {
         `${API_BASE_URL}/Expense/${userId}/${month}/${year}`,
         { signal: opts.signal, timeout: 15000 },
     );
-    console.log("Expense in API: " + res.data);
+    //console.log("Expense in API: " + res.data);
     return res.data;
 };
 export const getExpenseById = async (id) => {

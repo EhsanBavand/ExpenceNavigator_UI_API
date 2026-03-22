@@ -16,9 +16,9 @@ export function ExpenseForm({ form, onChange, onSubmit, categories, subCategorie
 
                 <div className="col-12 col-md-3 required-wrapper">
                     <select
-                        name="category"
+                        name="categoryId"          // <-- changed
                         className="form-select"
-                        value={form.category}
+                        value={form.categoryId}    // <-- changed
                         onChange={onChange}
                         required
                     >
@@ -31,37 +31,31 @@ export function ExpenseForm({ form, onChange, onSubmit, categories, subCategorie
 
                 <div className="col-12 col-md-3 ">
                     <select
-                        name="subCategory"
+                        name="subCategoryId"        // <-- changed
                         className="form-select"
-                        value={form.subCategory}
+                        value={form.subCategoryId}  // <-- changed
                         onChange={onChange}
-                        disabled={!form.category}
+                        disabled={!form.categoryId}
                     >
                         <option value="">SubCategory</option>
-
                         {subCategories
-                            .filter(sc => sc.categoryId === form.category)
+                            .filter(sc => sc.categoryId === form.categoryId)
                             .map(sc => (
-                                <option key={sc.id} value={sc.id}>
-                                    {sc.name}
-                                </option>
+                                <option key={sc.id} value={sc.id}>{sc.name}</option>
                             ))}
                     </select>
                 </div>
 
                 <div className="col-12 col-md-6">
                     <select
-                        name="place"
+                        name="placeId"             // <-- changed
                         className="form-select"
-                        value={form.place}
+                        value={form.placeId}       // <-- changed
                         onChange={onChange}
                     >
                         <option value="">Place</option>
-
                         {places.map(p => (
-                            <option key={p.id} value={p.id}>
-                                {p.name}
-                            </option>
+                            <option key={p.id} value={p.id}>{p.name}</option>
                         ))}
                     </select>
                 </div>
