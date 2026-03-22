@@ -481,7 +481,7 @@ const SavingPage = () => {
                                     </div>
                                     <div className="modal-body">
                                         <div className="mb-3">
-                                            <label className="form-label">Name</label>
+                                            <label className="form-label">Name <span style={{ color: "red" }}>*</span></label>
                                             <input
                                                 className="form-control"
                                                 value={mItemName}
@@ -503,7 +503,7 @@ const SavingPage = () => {
                                             </select>
                                         </div>
                                         <div className="mb-3">
-                                            <label className="form-label">Target (optional)</label>
+                                            <label className="form-label">Target <span style={{ color: "red" }}>*</span></label>
                                             <input
                                                 type="number"
                                                 className="form-control"

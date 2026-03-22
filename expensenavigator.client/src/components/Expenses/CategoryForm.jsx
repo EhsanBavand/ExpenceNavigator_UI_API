@@ -6,7 +6,7 @@ export function CategoryForm({ name, budget, onName, onBudget, onSubmit }) {
     return (
         <form onSubmit={onSubmit} className="responsive-form">
             <div className="row g-2">
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-6 required-wrapper">
                     <input
                         type="text"
                         className="form-control"
@@ -16,7 +16,7 @@ export function CategoryForm({ name, budget, onName, onBudget, onSubmit }) {
                         required
                     />
                 </div>
-                <div className="col-12 col-md-4">
+                <div className="col-12 col-md-4 required-wrapper">
                     <input
                         type="number"
                         className="form-control"

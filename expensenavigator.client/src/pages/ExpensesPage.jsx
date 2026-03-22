@@ -82,6 +82,7 @@ export default function ExpensesPage() {
         remainingIncome: 0,
         remainingBudget: 0,
     });
+    // Open modal
 
     // ===== LOAD USER =====
     useEffect(() => {
@@ -184,10 +185,20 @@ export default function ExpensesPage() {
 
     const handleAddExpense = async (e) => {
         e.preventDefault();
+
         const [y, m] = expenseForm.date.split("-");
+
         await createExpense({
-            ...expenseForm,
             userId,
+            date: expenseForm.date,
+            categoryId: expenseForm.category,
+            subCategoryId: expenseForm.subCategory,
+            placeId: expenseForm.place,
+            amount: Number(expenseForm.amount),
+            paidFor: expenseForm.paidFor,
+            itemName: expenseForm.itemName,
+            note: expenseForm.note,
+            isFixed: expenseForm.isFixed,
             year: Number(y),
             month: Number(m),
         });

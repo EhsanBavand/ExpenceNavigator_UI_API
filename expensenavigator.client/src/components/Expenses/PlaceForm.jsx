@@ -5,7 +5,7 @@ export function PlaceForm({ placeName, onName, onSubmit }) {
     return (
         <form onSubmit={onSubmit}>
             <div className="row g-2">
-                <div className="col-12 col-md-10">
+                <div className="col-12 col-md-10 required-wrapper">
                     <input
                         type="text"
                         className="form-control"

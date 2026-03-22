@@ -5,7 +5,7 @@ export function SubCategoryForm({ categories, selectedCategory, subCategoryName,
     return (
         <form onSubmit={onSubmit}>
             <div className="row g-2">
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-6 required-wrapper">
                     <select className="form-select" value={selectedCategory} onChange={onCategory} required>
                         <option value="">Choose Category</option>
                         {categories.map((c) => (
@@ -14,7 +14,7 @@ export function SubCategoryForm({ categories, selectedCategory, subCategoryName,
                     </select>
                 </div>
 
-                <div className="col-12 col-md-4">
+                <div className="col-12 col-md-4 required-wrapper">
                     <input
                         type="text"
                         className="form-control"

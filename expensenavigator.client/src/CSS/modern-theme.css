@@ -975,27 +975,28 @@ small.muted {
 .recharts-wrapper svg *:focus {
     outline: none !important;
 }
-
-/*Star form required*/
 .required {
     color: #dc3545; /* bootstrap danger red */
     margin-left: 3px;
 }
-/*.field-required {
+
+/* Wrapper for required fields */
+.required-wrapper {
     position: relative;
 }
 
-    .field-required .required-star {
+    .required-wrapper::after {
+        content: "*";
+        color: red;
         position: absolute;
-        right: 10px;
+        left: 10px; 
         top: 50%;
         transform: translateY(-50%);
-        color: #dc3545;
-        font-weight: bold;
         pointer-events: none;
+        font-weight: bold;
     }
 
-    .field-required input,
-    .field-required select {
-        padding-right: 25px;
-    }*/
+    .required-wrapper .form-control,
+    .required-wrapper .form-select {
+        padding-left: 20px; 
+    }
