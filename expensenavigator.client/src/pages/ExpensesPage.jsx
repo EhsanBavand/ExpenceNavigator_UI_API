@@ -13,6 +13,7 @@ import { CategoryTable } from "../components/Expenses/CategoryTable";
 import { SubCategoryTable } from "../components/Expenses/SubCategoryTable";
 import { PlaceTable } from "../components/Expenses/PlaceTable";
 import { EditExpenseModal } from "../components/Expenses/EditExpenseModal";
+import { EditCategoryModal } from "../components/Expenses/EditCategoryModal";
 
 // ===== API SERVICES =====
 import {
@@ -25,6 +26,7 @@ import {
     createPlace,
     createExpense,
     updateExpense,
+    updateCategory,   // ← ADD THIS
     deleteCategory,
     deleteSubCategory,
     deletePlace,
@@ -85,9 +87,13 @@ export default function ExpensesPage() {
         remainingBudget: 0,
     });
 
-    // ===== EDIT MODAL =====
+    // ===== Expense MODAL =====
     const [showEditModal, setShowEditModal] = useState(false);
     const [editForm, setEditForm] = useState({});
+
+    // Category Modal
+    const [showCategoryModal, setShowCategoryModal] = useState(false);
+    const [categoryEditForm, setCategoryEditForm] = useState({});
 
     // ===== LOAD USER =====
     useEffect(() => {
@@ -100,7 +106,7 @@ export default function ExpensesPage() {
                 decoded?.sub ||
                 decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
             setUserId(id);
-        } catch { }
+        } catch { /* empty */ }
     }, []);
 
     // ===== FETCH DATA =====
@@ -274,6 +280,42 @@ export default function ExpensesPage() {
             month: Number(m),
         });
         setShowEditModal(false);
+        fetchAll();
+    };
+
+    // Category Modal
+    const handleEditCategory = (category) => {
+
+        setCategoryEditForm({
+            catId: category.catId,
+            name: category.name,
+            budget: category.budget,
+            isActive: category.isActive,
+            userId
+        });
+
+        setShowCategoryModal(true);
+    };
+
+    const handleCategoryChange = (field, value) => {
+
+        setCategoryEditForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleCategorySubmit = async () => {
+
+        await updateCategory({
+            ...categoryEditForm,
+            userId,
+            month: selectedMonth,
+            year: selectedYear
+        });
+
+        setShowCategoryModal(false);
+
         fetchAll();
     };
 
@@ -451,6 +493,7 @@ export default function ExpensesPage() {
                     {tableTab === "category" && (
                         <CategoryTable
                             categories={categories}
+                            onEdit={handleEditCategory}
                             onDelete={(id) => handleDelete(id, "category")}
                         />
                     )}
@@ -488,6 +531,14 @@ export default function ExpensesPage() {
                         places={places}
                         onChange={handleEditChange}
                         onSubmit={handleEditSubmit}
+                    />
+
+                    <EditCategoryModal
+                        show={showCategoryModal}
+                        onClose={() => setShowCategoryModal(false)}
+                        form={categoryEditForm}
+                        onChange={handleCategoryChange}
+                        onSubmit={handleCategorySubmit}
                     />
                 </div>
             </div>

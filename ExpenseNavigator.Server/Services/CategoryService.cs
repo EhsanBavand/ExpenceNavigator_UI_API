@@ -111,9 +111,13 @@ namespace ExpenseNavigatorAPI.Services
                 Year = year
             };
         }
-        public async Task<CategoryDto> UpdateUserCategoryAsync(CategoryDto dto)
+        public async Task<CategoryDto?> UpdateUserCategoryAsync(CategoryDto dto)
         {
-            var categoryId = Guid.Parse(dto.CatId);
+            if (dto == null || string.IsNullOrEmpty(dto.CatId))
+                return null;
+
+            if (!Guid.TryParse(dto.CatId, out Guid categoryId))
+                return null;
 
             var entity = await _context.Categories
                 .FirstOrDefaultAsync(c => c.Id == categoryId && c.UserId == dto.UserId);
@@ -121,44 +125,42 @@ namespace ExpenseNavigatorAPI.Services
             if (entity == null)
                 return null;
 
-            // Update category fields
+            // ===== UPDATE CATEGORY =====
             entity.Name = dto.Name;
             entity.IsActive = dto.IsActive;
 
-            // ---- UPSERT BUDGET ----
+            // ===== FIND BUDGET =====
             var budget = await _context.UserCategoryBudget
-                .FirstOrDefaultAsync(b =>
+                .SingleOrDefaultAsync(b =>
                     b.CategoryId == categoryId &&
                     b.UserId == dto.UserId &&
                     b.Month == dto.Month &&
                     b.Year == dto.Year);
 
-            if (budget != null)
+            // ===== UPSERT BUDGET =====
+            if (budget == null)
             {
-                // Update existing
-                budget.Budget = dto.Budget;
-                budget.IsRecurring = dto.IsRecurring;
-                budget.IsActive = true;
-                budget.UpdatedDate = DateTime.UtcNow;
-            }
-            else
-            {
-                // Create new
-                _context.UserCategoryBudget.Add(new UserCategoryBudget
+                budget = new UserCategoryBudget
                 {
                     Id = Guid.NewGuid(),
                     UserId = dto.UserId,
                     CategoryId = categoryId,
-                    Budget = dto.Budget,
                     Month = dto.Month,
                     Year = dto.Year,
-                    IsRecurring = dto.IsRecurring,
-                    IsActive = true,
                     CreatedDate = DateTime.UtcNow
-                });
+                };
+
+                await _context.UserCategoryBudget.AddAsync(budget);
             }
 
+            // Always update values (works for both new and existing)
+            budget.Budget = dto.Budget;
+            budget.IsRecurring = dto.IsRecurring;
+            budget.IsActive = true;
+            budget.UpdatedDate = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
+
             return dto;
         }
         public async Task<bool> DeleteUserCategoryAsync(Guid categoryId, string userId, int month, int year)
