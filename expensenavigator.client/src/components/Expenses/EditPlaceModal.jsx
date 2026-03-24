@@ -19,17 +19,6 @@ export function EditPlaceModal({ show, onClose, form, subCategories, onChange, o
                     onChange={(e) => onChange("name", e.target.value)}
                 />
 
-                <Form.Select
-                    className="mb-2"
-                    value={form.subCategoryId || ""}
-                    onChange={(e) => onChange("subCategoryId", e.target.value)}
-                >
-                    <option value="">Select SubCategory</option>
-                    {subCategories.map((sc) => (
-                        <option key={sc.id} value={sc.id}>{sc.name}</option>
-                    ))}
-                </Form.Select>
-
                 <Form.Check
                     type="checkbox"
                     label="Active"

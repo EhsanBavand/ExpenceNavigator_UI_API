@@ -14,6 +14,9 @@ import { SubCategoryTable } from "../components/Expenses/SubCategoryTable";
 import { PlaceTable } from "../components/Expenses/PlaceTable";
 import { EditExpenseModal } from "../components/Expenses/EditExpenseModal";
 import { EditCategoryModal } from "../components/Expenses/EditCategoryModal";
+import { EditSubCategoryModal } from "../components/Expenses/EditSubCategoryModal";
+import { EditPlaceModal } from "../components/Expenses/EditPlaceModal"; 
+
 
 // ===== API SERVICES =====
 import {
@@ -32,6 +35,8 @@ import {
     deletePlace,
     deleteExpense,
     getDashboardSummary,
+    updateSubCategory,
+    updatePlace
 } from "../services/api";
 
 const currency = (v) =>
@@ -94,6 +99,14 @@ export default function ExpensesPage() {
     // Category Modal
     const [showCategoryModal, setShowCategoryModal] = useState(false);
     const [categoryEditForm, setCategoryEditForm] = useState({});
+
+    // SubCategory Modal
+    const [showSubCategoryModal, setShowSubCategoryModal] = useState(false);
+    const [subCategoryEditForm, setSubCategoryEditForm] = useState({});
+
+    // ===== PLACE MODAL =====
+    const [showPlaceModal, setShowPlaceModal] = useState(false);
+    const [placeEditForm, setPlaceEditForm] = useState({});
 
     // ===== LOAD USER =====
     useEffect(() => {
@@ -319,6 +332,66 @@ export default function ExpensesPage() {
         fetchAll();
     };
 
+    // Sub category Modal
+    const handleEditSubCategory = (subCategory) => {
+
+        setSubCategoryEditForm({
+            id: subCategory.id,
+            name: subCategory.name,
+            categoryId: subCategory.categoryId,
+            isActive: subCategory.isActive,
+            userId: userId,
+            isRecurring: subCategory.isRecurring
+        });
+
+        setShowSubCategoryModal(true);
+    };
+
+    const handleSubCategoryChange = (field, value) => {
+
+        setSubCategoryEditForm(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleSubCategorySubmit = async () => {
+
+        await updateSubCategory(
+            subCategoryEditForm.id,
+            subCategoryEditForm
+        );
+
+        setShowSubCategoryModal(false);
+
+        fetchAll();
+    };
+
+    // Place Modal
+    // Open place modal
+    const handleEditPlace = (place) => {
+        setPlaceEditForm({
+            id: place.id,
+            name: place.name,
+            subCategoryId: place.subCategoryId || "",
+            isActive: place.isActive,
+            userId
+        });
+        setShowPlaceModal(true);
+    };
+
+    // Handle changes inside modal
+    const handlePlaceChange = (field, value) => {
+        setPlaceEditForm(prev => ({ ...prev, [field]: value }));
+    };
+
+    // Submit changes
+    const handlePlaceSubmit = async () => {
+        await updatePlace(placeEditForm.id, placeEditForm);
+        setShowPlaceModal(false);
+        fetchAll();
+    };
+
     return (
         <div className="container mt-4">
             <h4 className="page-title">Expenses</h4>
@@ -412,8 +485,9 @@ export default function ExpensesPage() {
 
             {/* ===== MANAGE TABS ===== */}
             <div className="panel">
+
                 <div className="panel-header">
-                    <h6 className="panel-header-title">Manage</h6>
+                    <h6 className="panel-header-title">Manage</h6>                    
                 </div>
 
                 <div className="panel-body">
@@ -502,12 +576,16 @@ export default function ExpensesPage() {
                         <SubCategoryTable
                             subCategories={subCategories}
                             categories={categories}
+                            onEdit={handleEditSubCategory}
                             onDelete={(id) => handleDelete(id, "subCategory")}
                         />
                     )}
-
                     {tableTab === "place" && (
-                        <PlaceTable places={places} onDelete={(id) => handleDelete(id, "place")} />
+                        <PlaceTable
+                            places={places}
+                            onEdit={handleEditPlace}   // ← pass handler
+                            onDelete={(id) => handleDelete(id, "place")}
+                        />
                     )}
 
                     {tableTab === "expense" && (
@@ -540,6 +618,23 @@ export default function ExpensesPage() {
                         onChange={handleCategoryChange}
                         onSubmit={handleCategorySubmit}
                     />
+                    <EditSubCategoryModal
+                        show={showSubCategoryModal}
+                        onClose={() => setShowSubCategoryModal(false)}
+                        form={subCategoryEditForm}
+                        categories={categories}
+                        onChange={handleSubCategoryChange}
+                        onSubmit={handleSubCategorySubmit}
+                    />
+                    <EditPlaceModal
+                        show={showPlaceModal}
+                        onClose={() => setShowPlaceModal(false)}
+                        form={placeEditForm}
+                        subCategories={subCategories} // optional, if you want subcategory select
+                        onChange={handlePlaceChange}
+                        onSubmit={handlePlaceSubmit}
+                    />
+                    
                 </div>
             </div>
         </div>

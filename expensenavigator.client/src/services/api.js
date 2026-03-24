@@ -279,7 +279,6 @@ export const getPlaces = async (userId) => {
     const res = await axios.get(`${API_BASE_URL}/Place?userId=${userId}`);
     return res.data;
 };
-
 export const createPlace = async (place) => {
     const res = await axios.post(`${API_BASE_URL}/Place`, place);
     return res.data;
