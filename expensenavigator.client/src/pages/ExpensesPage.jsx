@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Modal, Form, Alert } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
 import "../CSS/Expenses.css";
 
@@ -15,8 +15,7 @@ import { PlaceTable } from "../components/Expenses/PlaceTable";
 import { EditExpenseModal } from "../components/Expenses/EditExpenseModal";
 import { EditCategoryModal } from "../components/Expenses/EditCategoryModal";
 import { EditSubCategoryModal } from "../components/Expenses/EditSubCategoryModal";
-import { EditPlaceModal } from "../components/Expenses/EditPlaceModal"; 
-
+import { EditPlaceModal } from "../components/Expenses/EditPlaceModal";
 
 // ===== API SERVICES =====
 import {
@@ -36,7 +35,11 @@ import {
     deleteExpense,
     getDashboardSummary,
     updateSubCategory,
-    updatePlace
+    updatePlace,
+    // For Copy Expense and Copy Category Modals
+    copyExpenseByRange,
+    copyCategoryBudget
+
 } from "../services/api";
 
 const currency = (v) =>
@@ -392,6 +395,67 @@ export default function ExpensesPage() {
         fetchAll();
     };
 
+
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    // ================= STATE =================
+    const [showCopyCategoryBudgetModal, setShowCopyCategoryBudgetModal] = useState(false);
+    const [showGenerateModal, setShowGenerateExpenseModal] = useState(false);
+    const [generateRange, setGenerateRange] = useState({
+        sourceMonth: selectedMonth,
+        sourceYear: selectedYear,
+        fromMonth: selectedMonth,
+        fromYear: selectedYear,
+        toMonth: selectedMonth,
+        toYear: selectedYear,
+    });
+    const [categoryBudgetRange, setCategoryBudgetRange] = useState({
+        sourceMonth: new Date().getMonth() + 1,
+        sourceYear: new Date().getFullYear(),
+        fromMonth: new Date().getMonth() + 2 > 12 ? 12 : new Date().getMonth() + 2,
+        toMonth: new Date().getMonth() + 2 > 12 ? 12 : new Date().getMonth() + 2,
+    });
+
+    const [copyMessage, setCopyMessage] = useState("");
+    const [categoryCopyMessage, setCategoryCopyMessage] = useState("");
+
+    const expenseList = expenses;
+    const hasDataToCopy = expenseList.length > 0;
+
+    const fetchData = async () => {
+        try {
+            const [catRes, subRes, placeRes, expRes] = await Promise.all([
+                getCategories(userId, selectedMonth, selectedYear),
+                getSubCategories(userId),
+                getPlaces(userId),
+                getExpenses(userId, selectedMonth, selectedYear),
+            ]);
+            setCategories(catRes);
+            setSubCategories(subRes);
+            setPlaces(placeRes);
+            setExpenses(expRes);
+        } catch (err) {
+            console.error("Error fetching data", err);
+        }
+    };
+
+    const fetchSummary = async () => {
+        if (!userId || !selectedMonth || !selectedYear) return;
+        try {
+            const data = await getDashboardSummary(userId, parseInt(selectedMonth), parseInt(selectedYear));
+            setSummary(data);
+        } catch (err) {
+            console.error("Error fetching dashboard summary:", err);
+        }
+    };
+
+    const refreshAll = async () => {
+        await Promise.all([fetchData(), fetchSummary()]);
+    };
+     
     return (
         <div className="container mt-4">
             <h4 className="page-title">Expenses</h4>
@@ -408,8 +472,8 @@ export default function ExpensesPage() {
                                 value={uiMonth}
                                 onChange={(e) => setUiMonth(Number(e.target.value))}
                             >
-                                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                                    <option key={m} value={m}>{m}</option>
+                                {monthNames.map((m, index) => (
+                                    <option key={index + 1} value={index + 1}>{m}</option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
@@ -549,6 +613,14 @@ export default function ExpensesPage() {
             <div className="panel">
                 <div className="panel-header">
                     <h6 className="panel-header-title">Overview & Tables</h6>
+                    <div className="d-flex gap-2 stack-sm">
+                        <Button className="btn-pill btn-blue full-btn-sm" onClick={() => setShowCopyCategoryBudgetModal(true)}>
+                            <i className="bi bi-files"></i><span className="ms-1">Copy Categories</span>
+                        </Button>
+                        <Button className="btn-pill btn-green full-btn-sm" onClick={() => setShowGenerateExpenseModal(true)}>
+                            <i className="bi bi-calendar2-plus"></i><span className="ms-1">Copy Expenses</span>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="panel-body">
@@ -634,7 +706,234 @@ export default function ExpensesPage() {
                         onChange={handlePlaceChange}
                         onSubmit={handlePlaceSubmit}
                     />
-                    
+                    {/* Copy Expenses Modal */}
+                    <Modal show={showGenerateModal} onHide={() => setShowGenerateExpenseModal(false)} centered>
+                        <Modal.Header closeButton><Modal.Title>Copy Expense</Modal.Title></Modal.Header>
+                        <Modal.Body>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="fw-semibold">Source Month &amp; Year</Form.Label>
+                                {/* stack on phones */}
+                                <div className="stack-sm">
+                                    <Form.Select
+                                        className="w-100-sm"
+                                        value={generateRange.sourceMonth}
+                                        onChange={(e) => {
+                                            const val = Number(e.target.value);
+                                            setGenerateRange((p) => ({
+                                                ...p,
+                                                sourceMonth: val,
+                                                fromMonth: val + 1 > 12 ? 12 : val + 1,
+                                                toMonth: val + 1 > 12 ? 12 : val + 1,
+                                            }));
+                                        }}
+                                    >
+                                        {monthNames.map((m, i) => (
+                                            <option key={i + 1} value={i + 1}>{m}</option>
+                                        ))}
+                                    </Form.Select>
+
+                                    <Form.Control
+                                        className="w-100-sm"
+                                        type="number"
+                                        value={generateRange.sourceYear}
+                                        onChange={(e) => setGenerateRange((p) => ({ ...p, sourceYear: Number(e.target.value) }))}
+                                    />
+                                </div>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label className="fw-semibold">Copy to Months</Form.Label>
+
+                                {/* From row */}
+                                <div className="stack-sm">
+                                    <div className="d-flex gap-2 align-items-center w-100-sm">
+                                        <Form.Label className="mb-0">From</Form.Label>
+                                        <Form.Select
+                                            className="w-100-sm"
+                                            value={generateRange.fromMonth}
+                                            onChange={(e) => {
+                                                const val = Number(e.target.value);
+                                                setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
+                                            }}
+                                        >
+                                            {monthNames
+                                                .map((m, i) => ({ label: m, value: i + 1 }))
+                                                .filter((m) => m.value > generateRange.sourceMonth)
+                                                .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        </Form.Select>
+                                    </div>
+
+                                    {/* To row */}
+                                    <div className="d-flex gap-2 align-items-center w-100-sm">
+                                        <Form.Label className="mb-0">To</Form.Label>
+                                        <Form.Select
+                                            className="w-100-sm"
+                                            value={generateRange.toMonth}
+                                            onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
+                                        >
+                                            {monthNames
+                                                .map((m, i) => ({ label: m, value: i + 1 }))
+                                                .filter((m) => m.value >= generateRange.fromMonth)
+                                                .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        </Form.Select>
+                                    </div>
+                                </div>
+
+                                {!copyMessage && (
+                                    <Alert variant="info" className="mt-2 mb-0">
+                                        Only the expenses from the selected source month will be copied.
+                                        Target months must be after the source month and within the same year.
+                                    </Alert>
+                                )}
+                                {copyMessage && (
+                                    <Alert
+                                        variant={copyMessage.toLowerCase().includes("success") ? "success" : "warning"}
+                                        className="mt-2 mb-0"
+                                    >
+                                        {copyMessage}
+                                    </Alert>
+                                )}
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowGenerateExpenseModal(false)}>Cancel</Button>
+                            <Button
+                                className="btn-pill btn-blue"
+                                disabled={!hasDataToCopy}
+                                onClick={async () => {
+                                    try {
+                                        const payload = {
+                                            UserId: userId,
+                                            SourceMonth: generateRange.sourceMonth,
+                                            SourceYear: generateRange.sourceYear,
+                                            TargetFromMonth: generateRange.fromMonth,
+                                            TargetToMonth: generateRange.toMonth,
+                                        };
+                                        const { data } = await copyExpenseByRange(payload);
+                                        setCopyMessage(data.message);
+                                        await refreshAll();
+                                    } catch (err) {
+                                        setCopyMessage(err.response?.data || "Something went wrong while copying expenses.");
+                                    }
+                                }}
+                            >
+                                Copy
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
+                    {/* Copy Category Budget Modal */}
+                    <Modal show={showCopyCategoryBudgetModal} onHide={() => setShowCopyCategoryBudgetModal(false)} centered>
+                        <Modal.Header closeButton><Modal.Title>Copy Category Budget</Modal.Title></Modal.Header>
+                        <Modal.Body>
+                            <Form.Group className="mb-3">
+                                <Form.Label className="fw-semibold">Source Month &amp; Year</Form.Label>
+                                <div className="stack-sm">
+                                    <Form.Select
+                                        className="w-100-sm"
+                                        value={categoryBudgetRange.sourceMonth}
+                                        onChange={(e) => {
+                                            const val = Number(e.target.value);
+                                            setCategoryBudgetRange((p) => ({
+                                                ...p,
+                                                sourceMonth: val,
+                                                fromMonth: val + 1 > 12 ? 12 : val + 1,
+                                                toMonth: val + 1 > 12 ? 12 : val + 1,
+                                            }));
+                                        }}
+                                    >
+                                        {monthNames.map((m, i) => (
+                                            <option key={i + 1} value={i + 1}>{m}</option>
+                                        ))}
+                                    </Form.Select>
+
+                                    <Form.Control
+                                        className="w-100-sm"
+                                        type="number"
+                                        value={categoryBudgetRange.sourceYear}
+                                        onChange={(e) => setCategoryBudgetRange((p) => ({ ...p, sourceYear: Number(e.target.value) }))}
+                                    />
+                                </div>
+                            </Form.Group>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label className="fw-semibold">Copy to Months</Form.Label>
+
+                                <div className="stack-sm">
+                                    <div className="d-flex gap-2 align-items-center w-100-sm">
+                                        <Form.Label className="mb-0">From</Form.Label>
+                                        <Form.Select
+                                            className="w-100-sm"
+                                            value={categoryBudgetRange.fromMonth}
+                                            onChange={(e) => {
+                                                const val = Number(e.target.value);
+                                                setCategoryBudgetRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
+                                            }}
+                                        >
+                                            {monthNames
+                                                .map((m, i) => ({ label: m, value: i + 1 }))
+                                                .filter((m) => m.value > categoryBudgetRange.sourceMonth)
+                                                .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        </Form.Select>
+                                    </div>
+
+                                    <div className="d-flex gap-2 align-items-center w-100-sm">
+                                        <Form.Label className="mb-0">To</Form.Label>
+                                        <Form.Select
+                                            className="w-100-sm"
+                                            value={categoryBudgetRange.toMonth}
+                                            onChange={(e) => setCategoryBudgetRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
+                                        >
+                                            {monthNames
+                                                .map((m, i) => ({ label: m, value: i + 1 }))
+                                                .filter((m) => m.value >= categoryBudgetRange.fromMonth)
+                                                .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        </Form.Select>
+                                    </div>
+                                </div>
+
+                                {!categoryCopyMessage && (
+                                    <Alert variant="info" className="mt-2 mb-0">
+                                        Only the budgets from the selected source month will be copied.
+                                        Target months must be after the source month and within the same year.
+                                    </Alert>
+                                )}
+                                {categoryCopyMessage && (
+                                    <Alert
+                                        variant={categoryCopyMessage.toLowerCase().includes("success") ? "success" : "warning"}
+                                        className="mt-2 mb-0"
+                                    >
+                                        {categoryCopyMessage}
+                                    </Alert>
+                                )}
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => setShowCopyCategoryBudgetModal(false)}>Cancel</Button>
+                            <Button
+                                className="btn-pill btn-green"
+                                onClick={async () => {
+                                    try {
+                                        const payload = {
+                                            UserId: userId,
+                                            SourceMonth: categoryBudgetRange.sourceMonth,
+                                            SourceYear: categoryBudgetRange.sourceYear,
+                                            TargetFromMonth: categoryBudgetRange.fromMonth,
+                                            TargetToMonth: categoryBudgetRange.toMonth,
+                                        };
+                                        const { data } = await copyCategoryBudget(payload);
+                                        setCategoryCopyMessage(data.message);
+                                        await refreshAll();
+                                    } catch (err) {
+                                        setCategoryCopyMessage(err.response?.data || "Something went wrong while copying budgets.");
+                                    }
+                                }}
+                            >
+                                Copy
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+
                 </div>
             </div>
         </div>
