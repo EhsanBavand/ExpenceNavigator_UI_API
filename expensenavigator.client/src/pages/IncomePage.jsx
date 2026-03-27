@@ -152,6 +152,18 @@ const IncomePage = () => {
         return () => clearTimeout(t);
     }, [error]);
 
+    useEffect(() => {
+        if (!showGenerateModal) return;
+
+        const nextMonth = Math.min(sourceMonth + 1, 12);
+
+        setGenerateRange({
+            fromMonth: nextMonth,
+            toMonth: nextMonth
+        });
+    }, [showGenerateModal, sourceMonth]);
+
+
     /** Handlers */
     const handleFormChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -568,11 +580,11 @@ const IncomePage = () => {
                     <Button variant="danger" onClick={handleDeleteConfirmed}>Delete</Button>
                 </Modal.Footer>
             </Modal>
+
             <Modal show={showSourceModal} onHide={() => setShowSourceModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{sourceFormData.id ? "Edit Source" : "Add Source"}</Modal.Title>
                 </Modal.Header>
-
                 <Form onSubmit={handleSaveSource}>
                     <Modal.Body>
                         <Form.Group className="mb-3">
@@ -609,8 +621,6 @@ const IncomePage = () => {
                     </Modal.Footer>
                 </Form>
             </Modal>
-
-
 
             {/* Add/Edit Income */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
@@ -702,97 +712,134 @@ const IncomePage = () => {
             </Modal>
 
             {/* Copy incomes */}
-            <Modal show={showGenerateModal} onHide={() => setShowGenerateModal(false)} centered>
-                <Modal.Header closeButton><Modal.Title>Copy Incomes</Modal.Title></Modal.Header>
+            <Modal
+                show={showGenerateModal}
+                onHide={() => setShowGenerateModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Copy Incomes</Modal.Title>
+                </Modal.Header>
+
                 <Modal.Body>
+                    {/* Source Month */}
                     <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Source Month &amp; Year</Form.Label>
-                        {/* stack on phones for better UX */}
+                        <Form.Label className="fw-semibold">
+                            Source Month & Year
+                        </Form.Label>
+
                         <div className="stack-sm">
                             <Form.Select
-                                className="w-100-sm"
                                 value={sourceMonth}
                                 onChange={(e) => {
                                     const val = Number(e.target.value);
+                                    const next = Math.min(val + 1, 12);
+
                                     setSourceMonth(val);
-                                    setGenerateRange((p) => ({ ...p, fromMonth: Math.max(val, p.fromMonth), toMonth: Math.max(val, p.toMonth) }));
+                                    setGenerateRange({
+                                        fromMonth: next,
+                                        toMonth: next
+                                    });
                                 }}
                             >
-                                {monthNames.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
+                                {monthNames.map((m, i) => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {m}
+                                    </option>
+                                ))}
                             </Form.Select>
+
                             <Form.Control
-                                className="w-100-sm"
                                 type="number"
                                 value={sourceYear}
-                                onChange={(e) => setSourceYear(Number(e.target.value))}
+                                onChange={(e) =>
+                                    setSourceYear(Number(e.target.value))
+                                }
                             />
                         </div>
                     </Form.Group>
 
                     {!hasDataToCopy ? (
                         <Alert variant="warning" className="mb-0">
-                            <i className="bi bi-exclamation-triangle me-2"></i> There are no incomes in this month to copy.
+                            <i className="bi bi-exclamation-triangle me-2"></i>
+                            There are no incomes in this month to copy.
                         </Alert>
                     ) : (
                         <Form.Group className="mb-3">
-                            <Form.Label className="fw-semibold">Copy to Months</Form.Label>
-                            {/* stack on phones */}
+                            <Form.Label className="fw-semibold">
+                                Copy to Months
+                            </Form.Label>
+
                             <div className="stack-sm align-items-stretch">
-                                <div className="d-flex align-items-center gap-2 w-100-sm">
+                                {/* From */}
+                                <div className="d-flex align-items-center gap-2">
                                     <Form.Label className="mb-0">From</Form.Label>
                                     <Form.Select
                                         className="w-100-sm"
                                         value={generateRange.fromMonth}
                                         onChange={(e) => {
                                             const val = Number(e.target.value);
-                                            setGenerateRange((p) => ({ ...p, fromMonth: val, toMonth: Math.max(val, p.toMonth) }));
+                                            setGenerateRange(p => ({
+                                                fromMonth: val,
+                                                toMonth: p.toMonth < val ? val : p.toMonth
+                                            }));
                                         }}
                                     >
-                                        {monthNames
-                                            .map((m, i) => ({ label: m, value: i + 1 }))
-                                            .filter((m) => m.value >= sourceMonth)
-                                            .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        {monthNames.map((m, i) => (
+                                            <option key={i + 1} value={i + 1}>{m}</option>
+                                        ))}
                                     </Form.Select>
                                 </div>
 
-                                <div className="d-flex align-items-center gap-2 w-100-sm">
+                                {/* To */}
+                                <div className="d-flex align-items-center gap-2">
                                     <Form.Label className="mb-0">To</Form.Label>
                                     <Form.Select
                                         className="w-100-sm"
                                         value={generateRange.toMonth}
-                                        onChange={(e) => setGenerateRange((p) => ({ ...p, toMonth: Number(e.target.value) }))}
+                                        onChange={(e) => {
+                                            const val = Number(e.target.value);
+                                            setGenerateRange(p => ({ ...p, toMonth: val }));
+                                        }}
                                     >
-                                        {monthNames
-                                            .map((m, i) => ({ label: m, value: i + 1 }))
-                                            .filter((m) => m.value >= generateRange.fromMonth)
-                                            .map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
+                                        {monthNames.map((m, i) => (
+                                            <option key={i + 1} value={i + 1}>{m}</option>
+                                        ))}
                                     </Form.Select>
                                 </div>
                             </div>
 
                             <Alert variant="info" className="mt-2 mb-0">
-                                Only the incomes from the selected source month will be copied.
-                                Existing incomes in target months will be skipped automatically.
+                                Only the incomes from the selected source month
+                                will be copied. Existing incomes in target months
+                                will be skipped automatically.
                             </Alert>
                         </Form.Group>
                     )}
                 </Modal.Body>
+
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowGenerateModal(false)}>Cancel</Button>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setShowGenerateModal(false)}
+                    >
+                        Cancel
+                    </Button>
+
                     <Button
                         className="btn-pill btn-blue"
                         disabled={!hasDataToCopy}
                         onClick={async () => {
-                            const payload = {
+                            await copyIncomesByRange({
                                 UserId: userId,
                                 SourceMonth: sourceMonth,
                                 SourceYear: sourceYear,
                                 TargetFromMonth: generateRange.fromMonth,
                                 TargetFromYear: sourceYear,
                                 TargetToMonth: generateRange.toMonth,
-                                TargetToYear: sourceYear,
-                            };
-                            await copyIncomesByRange(payload);
+                                TargetToYear: sourceYear
+                            });
+
                             setShowGenerateModal(false);
                         }}
                     >

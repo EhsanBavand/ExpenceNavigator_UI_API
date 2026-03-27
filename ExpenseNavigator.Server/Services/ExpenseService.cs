@@ -163,9 +163,125 @@ namespace ExpenseNavigatorAPI.Services
                 throw;
             }
         }
+        //public async Task<(bool Success, string Message)> CopyExpensesFromSourceMonthToTargets(CopyItemsByRangeDateDto dto)
+        //{
+        //    // Get all fixed expenses in the source month
+        //    var sourceFixed = await _context.Expenses
+        //        .AsNoTracking()
+        //        .Where(e => e.UserId == dto.UserId
+        //                    && e.Month == dto.SourceMonth
+        //                    && e.Year == dto.SourceYear
+        //                    && e.IsFixed)
+        //        .ToListAsync();
+
+        //    if (!sourceFixed.Any())
+        //        return (false, "No data found in the source month.");
+
+        //    // Generate target months list
+        //    var targets = GetMonthsInRange(dto.TargetFromMonth, dto.TargetToMonth)
+        //        .Where(m => !(m.Year == dto.SourceYear && m.Month == dto.SourceMonth))
+        //        .ToList();
+
+        //    if (!targets.Any())
+        //        return (false, "No valid target months to copy.");
+
+        //    // Check existing fixed expenses in the target months
+        //    var targetYears = targets.Select(t => t.Year).ToHashSet();
+        //    var targetMonths = targets.Select(t => t.Month).ToHashSet();
+
+        //    var existing = await _context.Expenses
+        //        .AsNoTracking()
+        //        .Where(e => e.UserId == dto.UserId
+        //                    && e.IsFixed
+        //                    && targetYears.Contains(e.Year)
+        //                    && targetMonths.Contains(e.Month))
+        //        .Select(e => new
+        //        {
+        //            e.Year,
+        //            e.Month,
+        //            e.CategoryId,
+        //            e.SubCategoryId,
+        //            e.PlaceId,
+        //            e.ItemName,
+        //            e.Amount,
+        //            e.IsFixed
+        //        })
+        //        .ToListAsync();
+
+        //    static string Key(int year, int month, Guid cat, Guid? sub, Guid? place, string? item, decimal amt, bool fixedFlag)
+        //        => $"{year}:{month}:{cat}:{(sub?.ToString() ?? "-")}:{(place?.ToString() ?? "-")}:{(item ?? "-")}:{amt}:{fixedFlag}";
+
+        //    var existingSet = new HashSet<string>(
+        //        existing.Select(e => Key(e.Year, e.Month, e.CategoryId, e.SubCategoryId, e.PlaceId, e.ItemName, e.Amount, e.IsFixed))
+        //    );
+
+        //    var toInsert = new List<Expense>();
+        //    var skippedMonths = new List<string>();
+
+        //    foreach (var (year, month) in targets)
+        //    {
+        //        bool monthHasData = false;
+
+        //        foreach (var s in sourceFixed)
+        //        {
+        //            var day = Math.Min(s.Date.Day, DateTime.DaysInMonth(year, month));
+        //            var k = Key(year, month, s.CategoryId, s.SubCategoryId, s.PlaceId, s.ItemName, s.Amount, s.IsFixed);
+        //            if (existingSet.Contains(k))
+        //            {
+        //                monthHasData = true;
+        //                continue;
+        //            }
+
+        //            toInsert.Add(new Expense
+        //            {
+        //                Id = Guid.NewGuid(),
+        //                UserId = s.UserId,
+        //                CategoryId = s.CategoryId,
+        //                SubCategoryId = s.SubCategoryId,
+        //                PlaceId = s.PlaceId,
+        //                ItemName = s.ItemName,
+        //                Amount = s.Amount,
+        //                PaidFor = s.PaidFor,
+        //                Note = s.Note,
+        //                IsFixed = s.IsFixed,
+        //                ExtraData = s.ExtraData,
+        //                Date = new DateTime(year, month, day),
+        //                Month = month,
+        //                Year = year
+        //            });
+        //        }
+
+        //        if (monthHasData && !toInsert.Any(e => e.Month == month))
+        //        {
+        //            skippedMonths.Add($"{MonthNames[month - 1]} {year}");
+        //        }
+        //    }
+
+        //    if (!toInsert.Any())
+        //        return (false, skippedMonths.Any() ? $"All target months already have data: {string.Join(", ", skippedMonths)}" : "No new data to copy.");
+
+        //    using var tx = await _context.Database.BeginTransactionAsync();
+        //    try
+        //    {
+        //        _context.Expenses.AddRange(toInsert);
+        //        await _context.SaveChangesAsync();
+        //        await tx.CommitAsync();
+
+        //        string message = skippedMonths.Any()
+        //            ? $"Copied successfully. Skipped months with existing data: {string.Join(", ", skippedMonths)}"
+        //            : "Copied successfully to all target months.";
+
+        //        return (true, message);
+        //    }
+        //    catch
+        //    {
+        //        await tx.RollbackAsync();
+        //        throw;
+        //    }
+        //}
+
         public async Task<(bool Success, string Message)> CopyExpensesFromSourceMonthToTargets(CopyItemsByRangeDateDto dto)
         {
-            // Get all fixed expenses in the source month
             var sourceFixed = await _context.Expenses
                 .AsNoTracking()
                 .Where(e => e.UserId == dto.UserId
@@ -177,101 +293,71 @@ namespace ExpenseNavigatorAPI.Services
             if (!sourceFixed.Any())
                 return (false, "No data found in the source month.");
 
-            // Generate target months list
             var targets = GetMonthsInRange(dto.TargetFromMonth, dto.TargetToMonth)
                 .Where(m => !(m.Year == dto.SourceYear && m.Month == dto.SourceMonth))
                 .ToList();
 
             if (!targets.Any())
-                return (false, "No valid target months to copy.");
+                return (false, "No valid target months.");
 
-            // Check existing fixed expenses in the target months
             var targetYears = targets.Select(t => t.Year).ToHashSet();
             var targetMonths = targets.Select(t => t.Month).ToHashSet();
 
-            var existing = await _context.Expenses
-                .AsNoTracking()
-                .Where(e => e.UserId == dto.UserId
-                            && e.IsFixed
-                            && targetYears.Contains(e.Year)
-                            && targetMonths.Contains(e.Month))
-                .Select(e => new
-                {
-                    e.Year,
-                    e.Month,
-                    e.CategoryId,
-                    e.SubCategoryId,
-                    e.PlaceId,
-                    e.ItemName,
-                    e.Amount,
-                    e.IsFixed
-                })
-                .ToListAsync();
-
-            static string Key(int year, int month, Guid cat, Guid? sub, Guid? place, string? item, decimal amt, bool fixedFlag)
-                => $"{year}:{month}:{cat}:{(sub?.ToString() ?? "-")}:{(place?.ToString() ?? "-")}:{(item ?? "-")}:{amt}:{fixedFlag}";
-
-            var existingSet = new HashSet<string>(
-                existing.Select(e => Key(e.Year, e.Month, e.CategoryId, e.SubCategoryId, e.PlaceId, e.ItemName, e.Amount, e.IsFixed))
-            );
-
-            var toInsert = new List<Expense>();
-            var skippedMonths = new List<string>();
-
-            foreach (var (year, month) in targets)
-            {
-                bool monthHasData = false;
-
-                foreach (var s in sourceFixed)
-                {
-                    var day = Math.Min(s.Date.Day, DateTime.DaysInMonth(year, month));
-                    var k = Key(year, month, s.CategoryId, s.SubCategoryId, s.PlaceId, s.ItemName, s.Amount, s.IsFixed);
-                    if (existingSet.Contains(k))
-                    {
-                        monthHasData = true;
-                        continue;
-                    }
-
-                    toInsert.Add(new Expense
-                    {
-                        Id = Guid.NewGuid(),
-                        UserId = s.UserId,
-                        CategoryId = s.CategoryId,
-                        SubCategoryId = s.SubCategoryId,
-                        PlaceId = s.PlaceId,
-                        ItemName = s.ItemName,
-                        Amount = s.Amount,
-                        PaidFor = s.PaidFor,
-                        Note = s.Note,
-                        IsFixed = s.IsFixed,
-                        ExtraData = s.ExtraData,
-                        Date = new DateTime(year, month, day),
-                        Month = month,
-                        Year = year
-                    });
-                }
-
-                if (monthHasData && !toInsert.Any(e => e.Month == month))
-                {
-                    skippedMonths.Add($"{MonthNames[month - 1]} {year}");
-                }
-            }
-
-            if (!toInsert.Any())
-                return (false, skippedMonths.Any() ? $"All target months already have data: {string.Join(", ", skippedMonths)}" : "No new data to copy.");
-
             using var tx = await _context.Database.BeginTransactionAsync();
+
             try
             {
+                // 1 — Remove existing fixed expenses in target months
+                var existingFixed = await _context.Expenses
+                    .Where(e => e.UserId == dto.UserId
+                                && e.IsFixed
+                                && targetYears.Contains(e.Year)
+                                && targetMonths.Contains(e.Month))
+                    .ToListAsync();
+
+                if (existingFixed.Any())
+                    _context.Expenses.RemoveRange(existingFixed);
+
+                // 2 — Prepare new expenses
+                var toInsert = new List<Expense>();
+
+                foreach (var (year, month) in targets)
+                {
+                    foreach (var s in sourceFixed)
+                    {
+                        var day = Math.Min(
+                            s.Date.Day,
+                            DateTime.DaysInMonth(year, month)
+                        );
+
+                        toInsert.Add(new Expense
+                        {
+                            Id = Guid.NewGuid(),
+                            UserId = s.UserId,
+                            CategoryId = s.CategoryId,
+                            SubCategoryId = s.SubCategoryId,
+                            PlaceId = s.PlaceId,
+                            ItemName = s.ItemName,
+                            Amount = s.Amount,
+                            PaidFor = s.PaidFor,
+                            Note = s.Note,
+                            IsFixed = s.IsFixed,
+                            ExtraData = s.ExtraData,
+                            Date = new DateTime(year, month, day),
+                            Month = month,
+                            Year = year
+                        });
+                    }
+                }
+
+                // 3 — Insert new data
                 _context.Expenses.AddRange(toInsert);
+
                 await _context.SaveChangesAsync();
+
                 await tx.CommitAsync();
 
-                string message = skippedMonths.Any()
-                    ? $"Copied successfully. Skipped months with existing data: {string.Join(", ", skippedMonths)}"
-                    : "Copied successfully to all target months.";
-
-                return (true, message);
+                return (true, $"Copied successfully to {targets.Count} months.");
             }
             catch
             {
@@ -283,32 +369,5 @@ namespace ExpenseNavigatorAPI.Services
         {
             Console.WriteLine($"[ExpenseService] Error in {method} for user {userId}, month {month}, year {year}: {ex.Message}");
         }
-
-        //private static IEnumerable<(int Year, int Month)> GetMonthsInRange(int fromMonth, int toMonth)
-        //{
-        //    int year = DateTime.Now.Year; // assume same year
-        //    var start = new DateTime(year, fromMonth, 1);
-        //    var end = new DateTime(year, toMonth, 1);
-
-        //    if (end < start)
-        //    {
-        //        (start, end) = (end, start);
-        //    }
-
-        //    var cursor = start;
-        //    while (cursor <= end)
-        //    {
-        //        yield return (cursor.Year, cursor.Month);
-        //        cursor = cursor.AddMonths(1);
-        //    }
-        //}
-
-        //private static readonly string[] MonthNames = new[]
-        //{
-        //    "January", "February", "March", "April", "May", "June",
-        //    "July", "August", "September", "October", "November", "December"
-        //};
-
-
     }
 }

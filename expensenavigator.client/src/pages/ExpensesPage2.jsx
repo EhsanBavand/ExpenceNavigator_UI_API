@@ -137,7 +137,6 @@ export default function ExpenseManager() {
     //    });
     //}, [expenses, categoryMap]);
     const expenseList = expenses; // no sorting
-    console.log("Expenses data:", expenseList);
 
 
     const [summary, setSummary] = useState({

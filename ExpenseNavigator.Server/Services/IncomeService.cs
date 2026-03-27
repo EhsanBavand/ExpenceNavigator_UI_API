@@ -232,59 +232,75 @@ namespace ExpenseNavigatorAPI.Services
         }
         public async Task<bool> CopyIncomesByRangeAsync(CopyItemsByRangeDateDto dto)
         {
-            // Get source incomes (searched month/year)
-            var incomesToCopy = await _context.Incomes.Where(i => i.UserId == dto.UserId
-                                                             && i.Month == dto.SourceMonth
-                                                             && i.Year == dto.SourceYear
-                                                             && i.IsRecurring == true).ToListAsync();
+            // Source incomes
+            var incomesToCopy = await _context.Incomes
+                .Where(i => i.UserId == dto.UserId
+                         && i.Month == dto.SourceMonth
+                         && i.Year == dto.SourceYear
+                         && i.IsRecurring)
+                .ToListAsync();
 
             if (!incomesToCopy.Any())
                 return false;
 
             var targetMonths = GetMonthsInRange(dto.TargetFromMonth, dto.TargetToMonth);
 
-            // Filter out the source month if it's included in the range
-            var filteredTargetMonths = targetMonths.Where(m => !(m.Year == dto.SourceYear && m.Month == dto.SourceMonth))
+            // Remove source month from targets
+            var filteredTargetMonths = targetMonths
+                .Where(m => !(m.Year == dto.SourceYear && m.Month == dto.SourceMonth))
                 .ToList();
 
             var copiedIncomes = new List<Income>();
 
             foreach (var (year, month) in filteredTargetMonths)
             {
-                copiedIncomes.AddRange(incomesToCopy.Select(i =>
-                    {
-                        var maxDay = DateTime.DaysInMonth(year, month);
-                        var day = Math.Min(i.Date.Day, maxDay);
+                // Remove existing target month data first
+                var existingTargetIncomes = await _context.Incomes
+                    .Where(i => i.UserId == dto.UserId
+                             && i.Month == month
+                             && i.Year == year
+                             && i.IsRecurring)
+                    .ToListAsync();
 
-                        return new Income
-                        {
-                            Id = Guid.NewGuid(),
-                            UserId = i.UserId,
-                            Owner = i.Owner,
-                            SourceType = i.SourceType,
-                            Amount = i.Amount,
-                            Date = new DateTime(year, month, day),
-                            Month = month,
-                            Year = year,
-                            IsRecurring = i.IsRecurring,
-                            IsEstimated = i.IsEstimated,
-                            Frequency = i.Frequency,
-                            Description = i.Description,
-                            CreatedBy = i.CreatedBy,
-                            CreatedDate = DateTime.UtcNow,
-                            ModifiedDate = DateTime.UtcNow,
-                            IncomeSourceId = i.IncomeSourceId,
-                        };
-                    })
-                );
+                if (existingTargetIncomes.Any())
+                {
+                    _context.Incomes.RemoveRange(existingTargetIncomes);
+                }
+
+                // Create new copies
+                copiedIncomes.AddRange(incomesToCopy.Select(i =>
+                {
+                    var maxDay = DateTime.DaysInMonth(year, month);
+                    var day = Math.Min(i.Date.Day, maxDay);
+
+                    return new Income
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = i.UserId,
+                        Owner = i.Owner,
+                        SourceType = i.SourceType,
+                        Amount = i.Amount,
+                        Date = new DateTime(year, month, day),
+                        Month = month,
+                        Year = year,
+                        IsRecurring = i.IsRecurring,
+                        IsEstimated = i.IsEstimated,
+                        Frequency = i.Frequency,
+                        Description = i.Description,
+                        CreatedBy = i.CreatedBy,
+                        CreatedDate = DateTime.UtcNow,
+                        ModifiedDate = DateTime.UtcNow,
+                        IncomeSourceId = i.IncomeSourceId,
+                    };
+                }));
             }
 
-
             _context.Incomes.AddRange(copiedIncomes);
+
             await _context.SaveChangesAsync();
+
             return true;
         }
-
 
 
     }
