@@ -234,7 +234,7 @@ const SavingPage = () => {
                 <div className="panel-body">
                     <div className="toolbar stack-sm">
                         <div className="mb-0 w-100-sm">
-                            <label className="form-label mb-1">Year</label>
+                            <label className="form-label mb-1 me-2">Year</label>
                             <select
                                 className="control-pill"
                                 value={year}

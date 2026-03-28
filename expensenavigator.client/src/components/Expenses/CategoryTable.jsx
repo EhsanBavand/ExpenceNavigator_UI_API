@@ -13,23 +13,16 @@ export function CategoryTable({
                         <th className="budget-col">Budget</th>
                         <th className="active-col">Active</th>
                         <th className="action-col">Action</th>
+
                     </tr>
+
                 </thead>
                 <tbody>
                     {categories.map((c) => (
                         <tr key={c.catId}>
-                            <td data-label="Name">
-                                {c.name}
-                            </td>
-
-                            <td data-label="Budget">
-                                {c.budget}
-                            </td>
-
-                            <td data-label="Active">
-                                {c.isActive ? "Yes" : "No"}
-                            </td>
-
+                            <td data-label="Name">{c.name}</td>
+                            <td data-label="Budget">{c.budget}</td>
+                            <td data-label="Active">{c.isActive ? "Yes" : "No"}</td>
                             <td data-label="Action" className="action-col">
                                 <div className="action-buttons">
                                     <button
@@ -46,6 +39,8 @@ export function CategoryTable({
                                         <i className="bi bi-trash icon-delete"></i>
                                     </button>
                                 </div>
+
+
                             </td>
                             
                         </tr>
