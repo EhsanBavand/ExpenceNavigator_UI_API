@@ -7,17 +7,13 @@ const API_BASE_URL = "/api"; // proxy to https://localhost:7037
 // const API_BASE_URL = "https://www.maisonwebapp.com/api";
 
 export const login = async (credentials) => {
-    // console.log("Calling login API:", `${API_BASE_URL}/auth/login`);
-    // console.log("Credentials:", credentials);
     const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
-    // console.log("Login response:", response);
     return response;
 };
 export const register = async (userInfo) => {
     return await axios.post(`${API_BASE_URL}/auth/register`, userInfo);
 };
 export const forgotPassword = async (email) => {
-    // ✅ wrap email in object { email: email } to match backend
     return await axios.post(`${API_BASE_URL}/auth/forgot-password`, { email });
 };
 export const resetPassword = async (data) => {
@@ -38,7 +34,7 @@ export const getIncomesByMonth = (userId, month, year) => {
 export const addIncome = async (income) => {
     try {
         const payload = {
-            id: income.id || undefined, // optional: backend can generate GUID
+            id: income.id || undefined, 
             userId: income.userId,
             owner: income.owner,
             sourceType: income.sourceType || "Rental", // <-- required now

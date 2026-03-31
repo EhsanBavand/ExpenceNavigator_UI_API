@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { login, register } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../CSS/LoginModern.css";
-function LoginModern() {
+function LoginModern({ onLoginSuccess }) {
     const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
     const [error, setError] = useState("");
@@ -43,17 +43,17 @@ function LoginModern() {
                 password: form.password,
             });
 
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("userId", response.data.userId);
+            onLoginSuccess(
+                response.data.token,
+                response.data.userId
+            );
 
-            navigate("/dashboard");
         } catch (err) {
             setError(err.response?.data?.message || "Login failed");
         } finally {
             setLoading(false);
         }
     };
-
     /* ================= REGISTER ================= */
     const handleRegister = async (e) => {
         e.preventDefault();
