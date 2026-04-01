@@ -1,4 +1,17 @@
 /* Remove black border (outline) when clicking anywhere in Recharts pie chart */
+* {
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
 .recharts-surface,
 .recharts-surface *,
 .recharts-sector {

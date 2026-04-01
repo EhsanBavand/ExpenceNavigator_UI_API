@@ -41,7 +41,7 @@ export function ExpenseTable({ expenses, categoryMap, subCategoryMap, placeMap, 
                             <td className="expense-actions">
                                 <div className="d-flex align-items-center gap-2">
                                     <button
-                                        className="btn-action-icon"
+                                        className="btn-action-icon "
                                         onClick={() => onEdit(e)}
                                         title="Edit"
                                     >

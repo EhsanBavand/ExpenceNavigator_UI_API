@@ -457,7 +457,7 @@ export default function ExpensesPage() {
     };
      
     return (
-        <div className="container mt-4">
+        <div className="container-fluid px-2 px-md-4 mt-3 mt-md-4">
             <h4 className="page-title">Expenses</h4>
             <div className="page-header-line"></div>
 
@@ -555,7 +555,7 @@ export default function ExpensesPage() {
                 </div>
 
                 <div className="panel-body">
-                    <div className="d-flex flex-wrap gap-2 mb-3">
+                    <div className="d-flex flex-wrap gap-2 mb-3 manage-tabs">
                         {["category", "subCategory", "place", "expense"].map((t) => (
                             <Button
                                 key={t}
@@ -624,7 +624,7 @@ export default function ExpensesPage() {
                 </div>
 
                 <div className="panel-body">
-                    <div className="d-flex flex-wrap gap-2 mb-3">
+                    <div className="d-flex flex-wrap gap-2 mb-3 manage-tabs">
                         {["category", "subCategory", "place", "expense"].map((t) => (
                             <Button
                                 key={t}

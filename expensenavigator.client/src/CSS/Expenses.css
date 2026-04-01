@@ -53,10 +53,11 @@
 /* ============================================
    KPI CARD STYLING
    ============================================ */
+
 .kpi-grid {
     display: grid;
-    gap: 15px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
 }
 
 .kpi-card {
@@ -129,11 +130,6 @@
     color: white !important;
 }
 
-/*.btn-ghost {
-    background: #f2f2f2 !important;
-    color: #444 !important;
-    border: none !important;
-}*/
 .btn-ghost {
     background-color: hsl(var(--secondary)) !important;
     color: hsl(var(--secondary-foreground)) !important;
@@ -160,20 +156,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+    align-items: end;
 }
 
 .w-100-sm {
     width: auto;
-}
-
-@media (max-width: 768px) {
-    .w-100-sm {
-        width: 100% !important;
-    }
-
-    .full-btn-sm {
-        width: 100% !important;
-    }
 }
 
 /* ============================================
@@ -223,16 +210,6 @@
 
 /* Icon-only action buttons */
 .btn-action-icon {
-    /*
-        background: transparent !important;
-        border: none !important;
-        padding: 4px 6px !important;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.15s ease-in-out;
-
-    */
-
     background: #f6f6f6 !important;
     padding: 2px 4px !important;
     border-radius: 6px;
@@ -247,7 +224,7 @@
     }
 
     .btn-action-icon i {
-        font-size: 1.1rem;
+        font-size: 15px;
     }
 
 .icon-edit {
@@ -258,6 +235,19 @@
     color: #dc3545;
 }
 
+.modal-body .stack-sm {
+    display: flex;
+    gap: 10px;
+}
+
+.manage-tabs button {
+    flex: 0 0 auto;
+}
+
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
 /* Fix action buttons alignment on mobile */
 .action-buttons {
     display: flex;
@@ -266,7 +256,6 @@
 
 /* ============================================/* RESPONSIVE TABLE LABELS
    ============================================ */
-
 @media (max-width: 576px) {
 
     .table thead {
@@ -280,6 +269,7 @@
         border-radius: 10px;
         padding: 8px;
         background: #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
     .table td {
@@ -289,6 +279,7 @@
         padding: 6px 8px;
         white-space: normal;
         border: none;
+        font-size: .9rem;
     }
 
         .table td::before {
@@ -305,9 +296,9 @@
         .action-col::before {
             content: "";
         }
-}
-
-@media (max-width: 576px) {
+    .btn-action-icon {
+        padding: 6px 8px !important;
+    }
 
     .action-col {
         justify-content: flex-end !important;
@@ -316,4 +307,114 @@
         .action-col::before {
             content: "";
         }
+    .btn-pill {
+        height: 42px;
+        font-size: .95rem !important;
+    }
+
+    .page-title {
+        font-size: 1.2rem;
+    }
+}
+
+
+@media(max-width:480px) {
+
+    .manage-tabs button {
+        flex: 1 1 100%;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-card {
+        padding: 14px;
+    }
+
+    .kpi-value {
+        font-size: 1.2rem;
+    }
+
+    .manage-tabs button {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width:768px) {
+
+    .stack-sm {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .stack-sm .form-group,
+        .stack-sm .form-select,
+        .stack-sm button {
+            width: 100%;
+        }
+    .manage-tabs button {
+        flex: 1 1 48%;
+    }
+    .panel-body {
+        padding: 14px;
+    }
+
+    .panel-header {
+        padding: 12px;
+    }
+
+    form .row {
+        flex-direction: column;
+    }
+
+    form .col {
+        width: 100%;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .modal-body .stack-sm {
+        flex-direction: column;
+    }
+
+    .modal-body .d-flex {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .modal-body label {
+        margin-bottom: 4px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .w-100-sm {
+        width: 100% !important;
+    }
+
+    .full-btn-sm {
+        width: 100% !important;
+    }
+
+    .manage-tabs button {
+        flex: 1 1 48%;
+    }
+
+    .table-responsive {
+        border: 1px solid #eee;
+        background: white;
+    }
+    btn-action-icon i{
+        font-size:15px;
+    }
 }
