@@ -22,7 +22,7 @@ export function ExpenseForm({ form, onChange, onSubmit, categories, subCategorie
                         onChange={onChange}
                         required
                     >
-                        <option value="">Category</option>
+                        <option value=""> Select Category</option>
                         {categories.map(c => (
                             <option key={c.catId} value={c.catId}>{c.name}</option>
                         ))}
@@ -37,7 +37,7 @@ export function ExpenseForm({ form, onChange, onSubmit, categories, subCategorie
                         onChange={onChange}
                         disabled={!form.categoryId}
                     >
-                        <option value="">SubCategory</option>
+                        <option value="">Select SubCategory</option>
                         {subCategories
                             .filter(sc => sc.categoryId === form.categoryId)
                             .map(sc => (
@@ -53,7 +53,7 @@ export function ExpenseForm({ form, onChange, onSubmit, categories, subCategorie
                         value={form.placeId}       // <-- changed
                         onChange={onChange}
                     >
-                        <option value="">Place</option>
+                        <option value="">Select Place</option>
                         {places.map(p => (
                             <option key={p.id} value={p.id}>{p.name}</option>
                         ))}

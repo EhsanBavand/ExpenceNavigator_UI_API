@@ -16,8 +16,7 @@ export default function SubCategoryPieChart({ data }) {
         <div className="card shadow-sm mb-4">
             <div className="card-body">
                 <h5 className="card-title">Sub Categories</h5>
-
-                <div style={{ width: "100%", height: 450 }}>
+                <div className="pie-chart-wrapper">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
@@ -43,9 +42,9 @@ export default function SubCategoryPieChart({ data }) {
                             <Tooltip cursor={false} />
 
                             <Legend
-                                layout="vertical"
-                                align="right"
-                                verticalAlign="middle"
+                                layout={window.innerWidth < 768 ? "horizontal" : "vertical"}
+                                align={window.innerWidth < 768 ? "center" : "right"}
+                                verticalAlign={window.innerWidth < 768 ? "bottom" : "middle"}
                                 iconSize={10}
                                 wrapperStyle={{ fontSize: 12, maxHeight: 450, overflowY: "auto" }}
                                 formatter={(value, entry, index) => {

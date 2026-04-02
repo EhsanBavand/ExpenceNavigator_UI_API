@@ -83,7 +83,7 @@ export default function CategoryChart({ data, onCategoryClick }) {
             <div className="card-body ">
                 <h5 className="card-title mb-4">Category Expenses</h5>
 
-                <div style={{ width: "100%", height: 550 }}>
+                <div className="category-chart-wrapper">
                     {!hasData ? (
                         <div
                             className="skeleton-box skeleton-chart-lg"
@@ -100,7 +100,7 @@ export default function CategoryChart({ data, onCategoryClick }) {
                                 <YAxis
                                     type="category"
                                     dataKey="CategoryName"
-                                    width={160}
+                                    width={window.innerWidth < 768 ? 100 : 160}
                                     interval={0}
                                     tick={{ fontSize: 14 }}
                                     axisLine={false}

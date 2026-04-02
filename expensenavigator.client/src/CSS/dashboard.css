@@ -8,7 +8,7 @@
     color: #0f172a;
 }
 
--container {
+.dashboard-container { {
     max-width: 1200px;
     margin: 0 auto;
     padding: 24px;
@@ -273,5 +273,75 @@
 @media (max-width: 768px) {
     .chart-scroll-y {
         max-height: 320px;
+    }
+}
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.category-chart-wrapper {
+    width: 100%;
+    height: 550px;
+}
+
+.pie-chart-wrapper {
+    width: 100%;
+    height: 450px;
+}
+
+.year-chart-wrapper {
+    width: 100%;
+    height: 350px;
+}
+
+/* MOBILE FIXES */
+@media (max-width:768px) {
+
+    .category-chart-wrapper {
+        height: 380px;
+    }
+
+    .pie-chart-wrapper {
+        height: 320px;
+    }
+
+    .year-chart-wrapper {
+        height: 260px;
+    }
+
+    /* filter buttons stack */
+    .btn-group {
+        width: 100%;
+    }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+    /* better card spacing */
+    .dashboard-card {
+        padding: 12px;
+    }
+}
+
+/* VERY SMALL */
+@media (max-width:480px) {
+
+    .category-chart-wrapper {
+        height: 320px;
+    }
+
+    .pie-chart-wrapper {
+        height: 280px;
+    }
+
+    .year-chart-wrapper {
+        height: 220px;
+    }
+
+    .dashboard-card .amount {
+        font-size: 18px;
     }
 }
