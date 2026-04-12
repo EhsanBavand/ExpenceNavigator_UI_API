@@ -1,0 +1,35 @@
+.public-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    background-color: #0f172a;
+}
+
+.logo {
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 24px;
+}
+
+    .nav-links a {
+        color: #e5e7eb;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .nav-links a.active {
+            color: #38bdf8;
+        }
+
+.login-btn {
+    border: 1px solid #38bdf8;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
