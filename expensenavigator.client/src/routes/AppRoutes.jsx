@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
-// ✅ EXISTING PAGES
+// AUTH & APP
 import LoginPage from "../pages/Login";
 import DashboardPage from "../pages/DashboardPage";
 import IncomePage from "../pages/IncomePage";
@@ -11,16 +11,14 @@ import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Layout from "../components/Layout";
 
-// ✅ NEW PUBLIC PAGES
+// PUBLIC PAGES
 import Home from "../pages/Home";
 import Services from "../pages/Services";
 import ExpenseNavigator from "../pages/MyApp";
 import Contact from "../pages/Contact";
 import PublicLayout from "../components/PublicLayout";
 
-
-
-
+// ROUTE GUARDS
 const ProtectedRoute = ({ isAuth, children }) =>
     isAuth ? children : <Navigate to="/login" replace />;
 
@@ -49,28 +47,28 @@ const AppRoutes = () => {
 
     return (
         <Routes>
-            {/* ✅ PUBLIC WEBSITE */}
+
+            {/* ✅ PUBLIC WEBSITE + AUTH (WITH NAVBAR & FOOTER) */}
             <Route element={<PublicLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/services" element={<Services />} />
-                <Route path="/contact" element={<Contact />} />
                 <Route path="/my-app" element={<ExpenseNavigator />} />
+                <Route path="/contact" element={<Contact />} />
+
+                {/* ✅ LOGIN & PASSWORD (NOW WITH NAVBAR & FOOTER) */}
+                <Route
+                    path="/login"
+                    element={
+                        <PublicRoute isAuth={isAuthenticated}>
+                            <LoginPage onLoginSuccess={handleLoginSuccess} />
+                        </PublicRoute>
+                    }
+                />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
             </Route>
 
-
-
-
-            {/* ✅ AUTH */}
-            <Route path="/login" element={
-                    <PublicRoute isAuth={isAuthenticated}>
-                        <LoginPage onLoginSuccess={handleLoginSuccess} />
-                    </PublicRoute>
-                }
-            />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-
-            {/* ✅ PROTECTED APP */}
+            {/* ✅ PROTECTED APP (SIDEBAR LAYOUT) */}
             <Route
                 path="/dashboard"
                 element={
@@ -111,8 +109,10 @@ const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             />
+
         </Routes>
     );
 };
 
 export default AppRoutes;
+``
