@@ -14,7 +14,7 @@ import Layout from "../components/Layout";
 // ✅ NEW PUBLIC PAGES
 import Home from "../pages/Home";
 import Services from "../pages/Services";
-import ExpenseNavigator from "../pages/ExpenseNavigator";
+import ExpenseNavigator from "../pages/MyApp";
 import Contact from "../pages/Contact";
 import PublicLayout from "../components/PublicLayout";
 
@@ -53,8 +53,8 @@ const AppRoutes = () => {
             <Route element={<PublicLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/services" element={<Services />} />
-                <Route path="/my-app" element={<ExpenseNavigator />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/my-app" element={<ExpenseNavigator />} />
             </Route>
 
 

@@ -1,0 +1,118 @@
+/* ---------- HERO ---------- */
+
+.home-hero {
+    height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
+    background: radial-gradient(circle at top left, #0f172a, #020617 60%, #000);
+}
+
+    .home-hero .container {
+        margin: 0;
+        padding-left: 150px;
+    }
+
+    .home-hero .container p{
+        color: white !important;
+    }
+/* ---------- SKILLS ---------- */
+
+.home-skills {
+    background: radial-gradient(circle at top, #0f172a, #020617 60%, #000);
+    padding: 120px 0;
+}
+
+    .home-skills .container {
+        max-width: 900px;
+    }
+
+.skills-title {
+    color: #fff;
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.skills-subtitle {
+    color: #94a3b8;
+    margin: 10px 0 40px;
+}
+
+/* ---------- GRID ---------- */
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+}
+
+/* ---------- CARD ---------- */
+
+.skill-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    color: #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.skill-icon {
+    width: 22px;
+    height: 22px;
+    color: hsl(142 71% 45%);
+    flex-shrink: 0;
+}
+
+.skill-card:hover {
+    border-color: hsl(142 71% 45% / 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px hsl(142 71% 45% / 0.12);
+}
+
+    .skill-card:hover .skill-icon {
+        color: hsl(142 71% 45%);
+    }
+
+/* ---------- CTA ---------- */
+
+.home-cta {
+    margin: 100px auto 0;
+    max-width: 700px;
+    padding: 48px 32px;
+    background: #0f172a;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+    .home-cta h3 {
+        color: #fff;
+    }
+
+    .home-cta p {
+        color: #94a3b8;
+        margin: 12px 0 24px;
+    }
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 992px) {
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-hero {
+        height: auto;
+        padding: 100px 0;
+    }
+}
+
+``

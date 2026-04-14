@@ -430,3 +430,16 @@ export const deleteSavingAsync = async (id, userId) => {
     });
     return res.data; // true/false
 };
+
+// =====================
+// Contact API
+// =====================
+export const sendContactMessage = async (contactData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/contact`, contactData);
+        return response.data;
+    } catch (error) {
+        console.error("Error sending contact message:", error);
+        throw error;
+    }
+};

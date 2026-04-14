@@ -1,0 +1,69 @@
+.services-page {
+    background: radial-gradient( circle at top, #0f172a 0%, #020617 60%, #000 100% );
+    padding: 120px 0;
+    min-height: calc(100vh - 72px);
+}
+
+/* Header */
+.services-eyebrow {
+    color: #22c55e;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+}
+
+.services-title {
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+    margin-top: 8px;
+}
+
+.services-subtitle {
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 12px auto 0;
+}
+
+/* Bottom CTA */
+.services-cta {
+    margin-top: 100px;
+}
+
+    .services-cta h3 {
+        color: white;
+        font-weight: 700;
+    }
+
+    .services-cta p {
+        color: #94a3b8;
+        margin: 12px 0 24px;
+    }
+
+/* Service card base */
+.service-card {
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 28px;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+    .service-card h5 {
+        color: white;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .service-card p {
+        color: #94a3b8;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+    /* ✅ Tailwind equivalent of hover:border-primary/40 */
+    .service-card:hover {
+        border-color: hsl(142 71% 45% / 0.4);
+        transform: translateY(-6px);
+        box-shadow: 0 10px 30px hsl(142 71% 45% / 0.08);
+    }
+
