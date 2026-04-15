@@ -1,89 +1,107 @@
 /* ===== HERO ===== */
 
 .app-hero {
-  background: radial-gradient #22c55e;  background: radial-gradient(circle at top, #0f172a, #020617 60%, #000);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
+    background: radial-gradient(circle at top, #0f172a, #020617 60%, #000);
+    padding: 120px 0;
 }
 
 .app-title {
-  color: #ffffff;
-  font-size: 48px;
-  font-weight: 800;
-  margin-top: 12px;
+    color: #ffffff;
+    font-size: 48px;
+    font-weight: 800;
+    margin-top: 12px;
 }
 
 .app-subtitle {
-  color: #94a3b8;
-  max-width: 700px;
-  margin: 16px auto 0;
+    color: #94a3b8;
+    max-width: 700px;
+    margin: 16px auto 0;
 }
 
 /* ===== ABOUT ===== */
 
 .app-about {
-  background: #020617;
-  padding: 100px 0;
+    background: #020617;
+    padding: 100px 0;
 }
 
-.app-about h2 {
-  color: #ffffff;
-  font-weight: 700;
-}
+    .app-about h2 {
+        color: #ffffff;
+        font-weight: 700;
+    }
 
-.app-about p {
-  color: #94a3b8;
-  max-width: 700px;
-  margin: 16px auto 0;
-}
+    .app-about p {
+        color: #94a3b8;
+        max-width: 700px;
+        margin: 16px auto 0;
+    }
 
 /* ===== FEATURES ===== */
 
 .app-features {
-  background: #020617;
-  padding: 100px 0;
+    background: #020617;
+    padding: 100px 0;
 }
 
 .feature-card {
-  background: #0f172a;
-  border-radius: 14px;
-  padding: 28px;
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: all 0.3s ease;
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 28px;
+    height: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.3s ease;
 }
 
-.feature-card h5 {
-  color: #ffffff;
-  margin-bottom: 10px;
-}
+    .feature-card h5 {
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
 
-.feature-card p {
-  color: #94a3b8;
-  font-size: 15px;
-}
+    .feature-card p {
+        color: #94a3b8;
+        font-size: 15px;
+    }
 
-.feature-card:hover {
-  border-color: hsl(142 71% 45% / 0.4);
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px hsl(142 71% 45% / 0.08);
-}
+    .feature-card:hover {
+        border-color: hsl(142 71% 45% / 0.4);
+        transform: translateY(-6px);
+        box-shadow: 0 10px 30px hsl(142 71% 45% / 0.08);
+    }
 
 /* ===== CTA ===== */
 
 .app-cta {
-  background: radial-gradient(circle at bottom, #0f172a, #020617 60%, #000);
-  padding: 120px 0;
+    background: radial-gradient(circle at bottom, #0f172a, #020617 60%, #000);
+    padding: 120px 0;
 }
 
-.app-cta h2 {
-  color: #ffffff;
-  font-weight: 800;
+    .app-cta h2 {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    .app-cta p {
+        color: #94a3b8;
+        margin: 12px 0 28px;
+    }
+
+/* ===== MOBILE ===== */
+
+@media (max-width: 768px) {
+    .app-title {
+        font-size: 36px;
+    }
+
+    .app-hero,
+    .app-about,
+    .app-features,
+    .app-cta {
+        padding: 80px 0;
+    }
+
+    .feature-card {
+        padding: 24px;
+    }
 }
 
-.app-cta p {
-  color: #94a3b8;
-  margin: 12px 0 28px;
-}
-
+``

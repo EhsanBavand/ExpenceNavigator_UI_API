@@ -5,96 +5,92 @@ function MyApp() {
     return (
         <>
             {/* ===== HERO ===== */}
-            <section className="app-hero">
-                <div className="container text-center">
-                    <span className="app-eyebrow">MY APPLICATION</span>
+            <section className="app-hero text-center py-5">
+                <div className="container px-3">
+                    <span className="text-success fw-semibold small">
+                        MY APPLICATION
+                    </span>
 
-                    <h1 className="app-title">Expense Navigator</h1>
+                    <h1 className="app-title">
+                        Masion Web App
+                    </h1>
 
                     <p className="app-subtitle">
-                        A modern personal finance web application designed to help users
-                        track income, expenses, savings, and budgets in one place.
+                        A modern web platform built to demonstrate real‑world
+                        full‑stack architecture, authentication, and scalability.
                     </p>
 
-                    <div className="d-flex justify-content-center gap-3 mt-4">
+                    <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
                         <Link to="/login" className="btn btn-success btn-lg">
-                            Login to App
+                            Login
                         </Link>
                         <Link to="/contact" className="btn btn-outline-light btn-lg">
-                            Contact Me
+                            Request Demo
                         </Link>
                     </div>
                 </div>
             </section>
 
             {/* ===== ABOUT ===== */}
-            <section className="app-about">
-                <div className="container text-center">
-                    <h2>What Expense Navigator Does</h2>
+            <section className="app-about text-center">
+                <div className="container px-3">
+                    <h2>About the App</h2>
                     <p>
-                        Expense Navigator helps users understand where their money comes
-                        from and where it goes. It provides a clear overview of financial
-                        activity and supports better budgeting and planning.
+                        This application showcases authentication flows, protected
+                        routes, dashboards, REST APIs, and clean UI patterns using
+                        modern web technologies.
                     </p>
                 </div>
             </section>
 
             {/* ===== FEATURES ===== */}
             <section className="app-features">
-                <div className="container">
+                <div className="container px-3">
                     <div className="row g-4">
-                        <div className="col-md-6 col-lg-4">
+
+                        <div className="col-12 col-md-6 col-lg-4">
                             <div className="feature-card">
-                                <h5>Income Tracking</h5>
-                                <p>Manage income with monthly and yearly filtering.</p>
+                                <h5>Authentication</h5>
+                                <p>
+                                    Secure login and session handling with protected
+                                    routes and role‑based access.
+                                </p>
                             </div>
                         </div>
 
-                        <div className="col-md-6 col-lg-4">
-                            <div className="feature-card">
-                                <h5>Expense Management</h5>
-                                <p>Track expenses and analyze spending habits.</p>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6 col-lg-4">
-                            <div className="feature-card">
-                                <h5>Categories & Budgets</h5>
-                                <p>Create categories and manage monthly budgets.</p>
-                            </div>
-                        </div>
-
-                        <div className="col-md-6 col-lg-4">
+                        <div className="col-12 col-md-6 col-lg-4">
                             <div className="feature-card">
                                 <h5>Dashboard</h5>
-                                <p>Visual overview of income, expenses, and savings.</p>
+                                <p>
+                                    Clean, responsive dashboards optimized for
+                                    productivity and clarity.
+                                </p>
                             </div>
                         </div>
 
-                        <div className="col-md-6 col-lg-4">
+                        <div className="col-12 col-md-6 col-lg-4">
                             <div className="feature-card">
-                                <h5>Savings</h5>
-                                <p>Track yearly savings and extra money.</p>
+                                <h5>API Integration</h5>
+                                <p>
+                                    Scalable REST APIs with modern backend architecture
+                                    and best practices.
+                                </p>
                             </div>
                         </div>
 
-                        <div className="col-md-6 col-lg-4">
-                            <div className="feature-card">
-                                <h5>Secure Authentication</h5>
-                                <p>Login, registration, and password recovery.</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
 
             {/* ===== CTA ===== */}
-            <section className="app-cta">
-                <div className="container text-center">
-                    <h2>Try Expense Navigator</h2>
-                    <p>Log in and explore the full application experience.</p>
+            <section className="app-cta text-center">
+                <div className="container px-3">
+                    <h2>Want access to the app?</h2>
+                    <p>
+                        Sign in to explore the platform or contact me for a walkthrough.
+                    </p>
                     <Link to="/login" className="btn btn-success btn-lg">
-                        Go to Login
+                        Login Now
                     </Link>
                 </div>
             </section>
@@ -103,5 +99,3 @@ function MyApp() {
 }
 
 export default MyApp;
-
-

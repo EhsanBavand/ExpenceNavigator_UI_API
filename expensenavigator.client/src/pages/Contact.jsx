@@ -1,6 +1,6 @@
 import "../CSS/Contact.css";
 import { useState } from "react";
-import { sendContactMessage } from "../services/api"; // adjust path if needed
+import { sendContactMessage } from "../services/api";
 
 function Contact() {
     const [form, setForm] = useState({
@@ -18,6 +18,7 @@ function Contact() {
             [e.target.name]: e.target.value
         });
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -31,21 +32,21 @@ function Contact() {
 
         try {
             await sendContactMessage(form);
-
             setSuccess("Message sent successfully! ✅");
             setForm({ name: "", email: "", message: "" });
-        } catch (error) {
+        } catch {
             setSuccess("Failed to send message ❌");
         }
 
         setLoading(false);
     };
+
     return (
         <section className="contact-page">
             <div className="container">
 
                 {/* ===== HEADER ===== */}
-                <div className="text-center mb-5">
+                <div className="text-center mb-5 px-3">
                     <span className="contact-eyebrow">GET IN TOUCH</span>
                     <h1 className="contact-title">Contact Me</h1>
                     <p className="contact-subtitle">
@@ -54,11 +55,11 @@ function Contact() {
                 </div>
 
                 {/* ===== CONTENT ===== */}
-                <div className="row g-5 justify-content-center">
+                <div className="row g-5 justify-content-center align-items-start">
 
-                    {/* LEFT INFO */}
-                    <div className="col-lg-3">
-                        <div className="contact-info">
+                    {/* INFO */}
+                    <div className="col-12 col-md-8 col-lg-3">
+                        <div className="contact-info text-center text-lg-start">
                             <div className="info-item">
                                 <span>Email</span>
                                 <p>ehsanbavandsavadkohei@gmail.com</p>
@@ -74,8 +75,8 @@ function Contact() {
                         </div>
                     </div>
 
-                    {/* RIGHT FORM */}
-                    <div className="col-lg-7">
+                    {/* FORM */}
+                    <div className="col-12 col-md-10 col-lg-7">
                         <form className="contact-form" onSubmit={handleSubmit}>
 
                             <div className="mb-3">
@@ -122,9 +123,8 @@ function Contact() {
                                 {loading ? "Sending..." : "Send Message"}
                             </button>
 
-                            {/* ✅ Feedback message */}
                             {success && (
-                                <div className="mt-3 text-center">
+                                <div className="mt-3 text-center contact-feedback">
                                     {success}
                                 </div>
                             )}

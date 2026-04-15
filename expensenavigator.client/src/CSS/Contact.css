@@ -1,10 +1,13 @@
+/* ---------- PAGE ---------- */
+
 .contact-page {
-    background: radial-gradient( circle at top, #0f172a 0%, #020617 60%, #000 100% );
+    background: radial-gradient(circle at top, #0f172a 0%, #020617 60%, #000 100%);
     padding: 120px 0;
     min-height: calc(100vh - 72px);
 }
 
-/* Header */
+/* ---------- HEADER ---------- */
+
 .contact-eyebrow {
     color: #22c55e;
     font-size: 12px;
@@ -25,7 +28,8 @@
     margin: 12px auto 0;
 }
 
-/* Left info */
+/* ---------- INFO ---------- */
+
 .contact-info {
     display: flex;
     flex-direction: column;
@@ -41,29 +45,61 @@
 .info-item p {
     color: #e5e7eb;
     margin: 4px 0 0;
+    word-break: break-word;
 }
 
-/* Form */
-.contact-form label {
+/* ---------- FORM ---------- */
+
+.contact-form {
+    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 32px;
+}
+
+    .contact-form label {
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .contact-form .form-control {
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: white;
+        padding: 12px 14px;
+    }
+
+        .contact-form .form-control::placeholder {
+            color: #64748b;
+        }
+
+        .contact-form .form-control:focus {
+            background: #0f172a;
+            color: white;
+            border-color: hsl(142 71% 45% / 0.4);
+            box-shadow: none;
+        }
+
+/* ---------- FEEDBACK ---------- */
+
+.contact-feedback {
     color: #94a3b8;
     font-size: 14px;
-    margin-bottom: 6px;
 }
 
-.contact-form .form-control {
-    background: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: white;
-    padding: 12px 14px;
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 768px) {
+    .contact-title {
+        font-size: 36px;
+    }
+
+    .contact-page {
+        padding: 80px 0;
+    }
+
+    .contact-form {
+        padding: 24px;
+    }
 }
-
-    .contact-form .form-control::placeholder {
-        color: #64748b;
-    }
-
-    .contact-form .form-control:focus {
-        background: #0f172a;
-        color: white;
-        border-color: hsl(142 71% 45% / 0.4);
-        box-shadow: none;
-    }
