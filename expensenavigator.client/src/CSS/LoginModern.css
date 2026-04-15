@@ -1,13 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
-
-.login-wrapper {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
-    font-family: "Montserrat", sans-serif;
-}
+﻿@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
 
 .loginPage {
     background-color: #fff;
@@ -39,7 +30,8 @@
     }
 
     .loginPage button {
-        background-color: #512da8;
+        /*background-color: #512da8;*/
+        background-color: #22c55e;
         color: #fff;
         font-size: 12px;
         padding: 10px 45px;
@@ -53,7 +45,8 @@
     }
 
         .loginPage button.hidden {
-            background-color: transparent;
+            /*background-color: transparent;*/
+            background-color: forestgreen;
             border-color: #fff;
         }
 
@@ -156,7 +149,8 @@
 .toggle {
     background-color: #512da8;
     height: 100%;
-    background: linear-gradient(to right, #5c6bc0, #512da8);
+    /*background: linear-gradient(to right, #5c6bc0, #512da8);*/
+    background: #22c55e;
     color: #fff;
     position: relative;
     left: -100%;
@@ -183,6 +177,7 @@
     top: 0;
     transform: translateX(0);
     transition: all 0.6s ease-in-out;
+
 }
 
 .toggle-left {
@@ -217,7 +212,8 @@
 .forgot-link {
     cursor: pointer;
     font-size: 13px;
-    color: #512da8;
+    /*color: #512da8;*/
+    color: #22c55e;
     margin-top: 5px;
 }
 
@@ -301,3 +297,18 @@
     color: #28a745;
     margin-top: 10px;
 }
+
+.login-layout {
+    padding: 100px 0; /* controls vertical density */
+    background: radial-gradient(circle at top, #0f172a 0%, #020617 60%, #000 100%);
+}
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+}
+.loginPage {
+    margin: 0 auto;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+}
+

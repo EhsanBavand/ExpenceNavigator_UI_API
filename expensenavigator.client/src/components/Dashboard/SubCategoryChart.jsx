@@ -13,9 +13,8 @@ export default function SubCategoryPieChart({ data }) {
     const showSliceLabels = data.length <= 10;
 
     return (
-        <div className="card shadow-sm mb-4">
+    /*    <div className="card shadow-sm mb-4">*/
             <div className="card-body">
-                <h5 className="card-title">Sub Categories</h5>
                 <div className="pie-chart-wrapper">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -59,6 +58,6 @@ export default function SubCategoryPieChart({ data }) {
                     </ResponsiveContainer>
                 </div>
             </div>
-        </div>
+      /*  </div>*/
     );
 }

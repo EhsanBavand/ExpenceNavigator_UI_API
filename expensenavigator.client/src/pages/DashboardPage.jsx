@@ -271,8 +271,12 @@ export default function DashboardPage() {
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={stats.monthlySeries}>
                                     <XAxis dataKey="name" />
-                                    <YAxis tickLine={false} width={48} />
-                                    <Tooltip cursor={false} />
+                                    <YAxis
+                                        tickLine={false}
+                                        width={60}
+                                        domain={[0, (dataMax) => Math.ceil(dataMax / 5000) * 5000]}
+                                        tickFormatter={(value) => value.toLocaleString()}
+                                    />                                   <Tooltip cursor={false} />
                                     <Legend wrapperStyle={{ paddingTop: 8 }} />
                                     <Bar dataKey="income" fill="#10b981" radius={[6, 6, 0, 0]} />
                                     <Bar dataKey="expense" fill="#ef4444" radius={[6, 6, 0, 0]} />

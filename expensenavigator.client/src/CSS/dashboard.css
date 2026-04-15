@@ -8,7 +8,7 @@
     color: #0f172a;
 }
 
-.dashboard-container { {
+.dashboard-container { 
     max-width: 1200px;
     margin: 0 auto;
     padding: 24px;
@@ -77,6 +77,7 @@
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 6px 12px rgba(16,24,40,0.06);
+    margin-bottom: 10px !important;
 }
 
 .chart-title {
@@ -263,18 +264,18 @@
         grid-template-columns: 1fr;
     }
 }
-.chart-scroll-y {
-    max-height: 420px; /* adjust as needed */
-    overflow-y: auto;
+/*.chart-scroll-y {
+    max-height: 420px;*/ /* adjust as needed */
+    /*overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-}
+}*/
 
-@media (max-width: 768px) {
+/*@media (max-width: 768px) {
     .chart-scroll-y {
         max-height: 320px;
     }
-}
+}*/
 .dashboard-container {
     max-width: 1200px;
     margin: 0 auto;

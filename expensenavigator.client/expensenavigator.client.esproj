@@ -10,6 +10,5 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="src\components\Expenses\" />
-    <Folder Include="src\Icon\" />
   </ItemGroup>
 </Project>
