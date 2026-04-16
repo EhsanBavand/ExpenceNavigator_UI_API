@@ -1,7 +1,7 @@
 /* ---------- HERO ---------- */
 
 .home-hero {
-    min-height: calc(100vh - 72px);
+    min-height: calc(75vh - 72px);
     display: flex;
     align-items: center;
     background: radial-gradient(circle at top left, #0f172a, #020617 60%, #000);

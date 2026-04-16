@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import CategoryChart from "../components/Dashboard/CategoryChart";
 import SubCategoryPieChart from "../components/Dashboard/SubCategoryChart";
@@ -20,7 +20,6 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-
 const currency = (n) =>
     !n
         ? "$0"
@@ -31,6 +30,8 @@ const currency = (n) =>
         });
 
 export default function DashboardPage() {
+    const subCategoryRef = useRef(null);
+
     const [userId, setUserId] = useState(null);
     const [summary, setSummary] = useState(null);
     const [categoryData, setCategoryData] = useState([]);
@@ -123,7 +124,6 @@ export default function DashboardPage() {
     const handleCategoryClick = async (catId) => {
         if (!userId) return;
         const monthToSend = viewType === "yearly" ? 0 : selectedMonth;
-
         try {
             const data = await SubCategoriesByCategory(catId, userId, monthToSend, selectedYear);
             const parsed = (Array.isArray(data) ? data : []).map((x) => ({
@@ -132,6 +132,14 @@ export default function DashboardPage() {
             }));
             setSubCategoryData(parsed);
             setSelectedCategoryId(catId);
+            // 👇 wait for render then scroll
+            setTimeout(() => {
+                subCategoryRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                });
+            }, 100);
+
         } catch (err) {
             console.error("Error loading subcategories", err);
             setSubCategoryData([]);
@@ -256,8 +264,9 @@ export default function DashboardPage() {
                 />
 
                 {subCategoryData.length > 0 && (
-                    <div className="card-surface">
+                    <div className="card-surface" ref={subCategoryRef}>
                         <h5 className="chart-title">Sub Categories</h5>
+
                         <div className="chart-scroll-y">
                             <SubCategoryPieChart data={subCategoryData} />
                         </div>
