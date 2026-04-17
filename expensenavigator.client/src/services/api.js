@@ -1,10 +1,10 @@
 import axios from "axios";
 
-// Local Host
-const API_BASE_URL = "/api"; // proxy to https://localhost:7037
+//// Local Host
+//const API_BASE_URL = "/api"; // proxy to https://localhost:7037
 
-// // // Server Host
-// const API_BASE_URL = "https://www.maisonwebapp.com/api";
+ // // Server Host
+ const API_BASE_URL = "https://www.maisonwebapp.com/api";
 
 export const login = async (credentials) => {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);

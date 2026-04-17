@@ -41,15 +41,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-// Configure CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReactApp",
-        policy => policy
-            .WithOrigins("http://localhost:54692", "https://localhost:54692") // add both
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
+
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -91,6 +83,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Enable HTTPS
+app.UseHttpsRedirection();
+
 // Enable Swagger
 if (app.Environment.IsDevelopment())
 {
@@ -98,11 +93,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Enable HTTPS
-app.UseHttpsRedirection();
 
-// Enable CORS
-app.UseCors("AllowReactApp");
+// Configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy
+            //// For Localhost development, allow both http and https origins
+            //.WithOrigins("http://localhost:54692", "https://localhost:54692")
+            // Fo Server deployment, allow the actual domain of the React app
+            .WithOrigins( "https://www.maisonwebapp.com","https://maisonwebapp.com")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+//// Enable CORS
+//app.UseCors("AllowReactApp");
 
 // Enable Authentication and Authorization
 app.UseAuthentication();

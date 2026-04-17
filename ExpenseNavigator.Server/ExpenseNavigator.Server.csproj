@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\index.html" />
+    <Content Remove="wwwroot\vite.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
@@ -24,6 +29,16 @@
     <ProjectReference Include="..\expensenavigator.client\expensenavigator.client.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\assets\bootstrap-icons-BeopsB42.woff" />
+    <None Include="wwwroot\assets\bootstrap-icons-mSm7cUeB.woff2" />
+    <None Include="wwwroot\assets\index-BQqYJUEn.css" />
+    <None Include="wwwroot\assets\index-Cs4MG7hS.js" />
+    <None Include="wwwroot\assets\logo-VjEaQXrU.png" />
+    <None Include="wwwroot\index.html" />
+    <None Include="wwwroot\vite.svg" />
   </ItemGroup>
 
 </Project>
