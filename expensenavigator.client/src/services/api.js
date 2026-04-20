@@ -3,8 +3,16 @@ import axios from "axios";
 //// Local Host
 //const API_BASE_URL = "/api"; // proxy to https://localhost:7037
 
- // // Server Host
- const API_BASE_URL = "https://www.maisonwebapp.com/api";
+// //// // Server Host
+// //const API_BASE_URL = "https://www.maisonwebapp.com/api";
+
+//const isDev = process.env.NODE_ENV === "development";
+const isDev = import.meta.env.DEV;
+
+// 🔹 Base URL changes automatically
+const API_BASE_URL = isDev
+    ? "/api" // local (proxy to backend)
+    : "https://www.maisonwebapp.com/api"; // production
 
 export const login = async (credentials) => {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
@@ -67,30 +75,6 @@ export const addIncome = async (income) => {
         throw error;
     }
 };
-//export const updateIncome = async (income) => {
-//  try {
-//    const payload = {
-//      ...income,
-//      sourceType: income.sourceType || "",
-//      date: new Date(income.date).toISOString(),
-//      createdDate: new Date(income.createdDate).toISOString(),
-//      modifiedDate: new Date().toISOString(),
-//      frequency: income.frequency.toString(),
-//    };
-
-//    // console.log("Payload sent to API:", payload);
-
-//    // const response = await axios.put("http://localhost:5283/api/income",payload,);
-//    const response = await axios.put(`${API_BASE_URL}/income`, payload);
-
-//    return response.data;
-//  } catch (error) {
-//    // console.error("API Error:", error.response?.data || error.message);
-//    throw error;
-//  }
-//};
-
-
 export const updateIncome = async (income) => {
     const payload = {
         ...income,
