@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\assets\bootstrap-icons-BeopsB42.woff" />
+    <Content Remove="wwwroot\assets\bootstrap-icons-mSm7cUeB.woff2" />
+    <Content Remove="wwwroot\assets\index-BQqYJUEn.css" />
+    <Content Remove="wwwroot\assets\index-NvpPsy_g.js" />
+    <Content Remove="wwwroot\assets\logo-VjEaQXrU.png" />
     <Content Remove="wwwroot\index.html" />
     <Content Remove="wwwroot\vite.svg" />
   </ItemGroup>
@@ -36,6 +41,7 @@
     <None Include="wwwroot\assets\bootstrap-icons-mSm7cUeB.woff2" />
     <None Include="wwwroot\assets\index-BQqYJUEn.css" />
     <None Include="wwwroot\assets\index-Cs4MG7hS.js" />
+    <None Include="wwwroot\assets\index-NvpPsy_g.js" />
     <None Include="wwwroot\assets\logo-VjEaQXrU.png" />
     <None Include="wwwroot\index.html" />
     <None Include="wwwroot\vite.svg" />
