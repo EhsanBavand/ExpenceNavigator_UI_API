@@ -1,11 +1,5 @@
 import axios from "axios";
 
-//// Local Host
-//const API_BASE_URL = "/api"; // proxy to https://localhost:7037
-
-// //// // Server Host
-// //const API_BASE_URL = "https://www.maisonwebapp.com/api";
-
 //const isDev = process.env.NODE_ENV === "development";
 const isDev = import.meta.env.DEV;
 
