@@ -1,50 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>12495ae5-58e6-4f80-afc3-e063510dc455</UserSecretsId>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>12495ae5-58e6-4f80-afc3-e063510dc455</UserSecretsId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\assets\bootstrap-icons-BeopsB42.woff" />
-    <Content Remove="wwwroot\assets\bootstrap-icons-mSm7cUeB.woff2" />
-    <Content Remove="wwwroot\assets\index-BQqYJUEn.css" />
-    <Content Remove="wwwroot\assets\index-NvpPsy_g.js" />
-    <Content Remove="wwwroot\assets\logo-VjEaQXrU.png" />
-    <Content Remove="wwwroot\index.html" />
-    <Content Remove="wwwroot\vite.svg" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="SendGrid" Version="9.29.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
-  </ItemGroup>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="SendGrid" Version="9.29.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\expensenavigator.client\expensenavigator.client.esproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\expensenavigator.client\expensenavigator.client.esproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\assets\bootstrap-icons-BeopsB42.woff" />
-    <None Include="wwwroot\assets\bootstrap-icons-mSm7cUeB.woff2" />
-    <None Include="wwwroot\assets\index-BQqYJUEn.css" />
-    <None Include="wwwroot\assets\index-Cs4MG7hS.js" />
-    <None Include="wwwroot\assets\index-NvpPsy_g.js" />
-    <None Include="wwwroot\assets\logo-VjEaQXrU.png" />
-    <None Include="wwwroot\index.html" />
-    <None Include="wwwroot\vite.svg" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="wwwroot\assets\bootstrap-icons-BeopsB42.woff" />
+		<None Include="wwwroot\assets\bootstrap-icons-mSm7cUeB.woff2" />
+		<None Include="wwwroot\assets\index-BQqYJUEn.css" />
+		<None Include="wwwroot\assets\index-Cs4MG7hS.js" />
+		<None Include="wwwroot\assets\index-NvpPsy_g.js" />
+		<None Include="wwwroot\assets\logo-VjEaQXrU.png" />
+		<None Include="wwwroot\index.html" />
+		<None Include="wwwroot\vite.svg" />
+	</ItemGroup>
 
 </Project>
