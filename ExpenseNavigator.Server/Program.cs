@@ -76,8 +76,8 @@ builder.Services.AddCors(options =>
 
 #region 🔐 JWT AUTHENTICATION
 
-var jwtKey = builder.Configuration["JWT:Secret"]
-    ?? throw new Exception("JWT Secret is missing");
+//var jwtKey = builder.Configuration["JWT:Secret"] ?? throw new Exception("JWT Secret is missing");
+var jwtKey = builder.Configuration["JWT:Secret"] ?? "TEMP_KEY_123456";
 
 builder.Services.AddAuthentication(options =>
 {
