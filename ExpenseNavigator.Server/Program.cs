@@ -32,8 +32,15 @@ builder.Services.AddScoped<ITestEmailService, TestEmailService>();
 
 #region 🗄️ DATABASE
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(
+//        builder.Configuration.GetConnectionString("DefaultConnection"),
+//        sql => sql.EnableRetryOnFailure()
+//    ));
 
 #endregion
 
@@ -141,7 +148,8 @@ var app = builder.Build();
 
 #region 🚀 PIPELINE (IMPORTANT ORDER)
 
-app.UseExceptionHandler("/error"); // must exist OR replace with inline handler
+//app.UseExceptionHandler("/error"); // must exist OR replace with inline handler
+app.UseExceptionHandler(errorApp => { });
 
 app.UseHttpsRedirection();
 
