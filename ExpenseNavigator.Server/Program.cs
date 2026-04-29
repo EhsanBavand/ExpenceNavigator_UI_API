@@ -145,11 +145,12 @@ app.UseExceptionHandler("/error"); // must exist OR replace with inline handler
 
 app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//// SWAGGER ONLY IN DEV AND PRODUCTION (NOT STAGING OR TESTING) - FIXED ✔
+//if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 
 app.UseCors("AllowReactApp");
 
