@@ -1,7 +1,6 @@
-import "../css/Contact.css";
 import { useState } from "react";
 import { sendContactMessage } from "../services/api";
-
+import "../css/contact.css";
 function Contact() {
     const [form, setForm] = useState({
         name: "",
@@ -42,7 +41,11 @@ function Contact() {
     };
 
     return (
-        <section className="contact-page">
+        <section className="contact-page" style={{
+            minHeight: "calc(100vh - 72px)",
+            background: "radial-gradient(circle at top, #0f172a 0%, #020617 60%, #000 100%)",
+            padding: "120px 0"
+        }}>
             <div className="container">
 
                 {/* ===== HEADER ===== */}
@@ -51,6 +54,7 @@ function Contact() {
                     <h1 className="contact-title">Contact Me</h1>
                     <p className="contact-subtitle">
                         Have a question or want to work together? Drop me a message!
+                        {/*Here is my contact information, or you can fill out the form and I'll get back to you as soon as possible.*/}
                     </p>
                 </div>
 
