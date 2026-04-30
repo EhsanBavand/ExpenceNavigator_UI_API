@@ -2,15 +2,20 @@ import React, { useState } from "react";
 import { login, register } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../css/LoginModern.css";
+
 function LoginModern({ onLoginSuccess }) {
     const navigate = useNavigate();
+
     const [isSignUp, setIsSignUp] = useState(false);
+
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+
+    const [showSignInPassword, setShowSignInPassword] = useState(false);
+    const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [email, setEmail] = useState("");
 
     const [form, setForm] = useState({
         username: "",
@@ -20,14 +25,16 @@ function LoginModern({ onLoginSuccess }) {
 
     const resetForm = () => {
         setForm({ username: "", email: "", password: "" });
+        setConfirmPassword("");
         setError("");
         setSuccess("");
-        setConfirmPassword("");
-        setEmail("");
     };
 
     const handleChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+        setForm((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
     };
 
     /* ================= LOGIN ================= */
@@ -43,17 +50,14 @@ function LoginModern({ onLoginSuccess }) {
                 password: form.password,
             });
 
-            onLoginSuccess(
-                response.data.token,
-                response.data.userId
-            );
-
+            onLoginSuccess(response.data.token, response.data.userId);
         } catch (err) {
             setError(err.response?.data?.message || "Login failed");
         } finally {
             setLoading(false);
         }
     };
+
     /* ================= REGISTER ================= */
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -74,10 +78,11 @@ function LoginModern({ onLoginSuccess }) {
                 password: form.password,
             });
 
-            setSuccess("Account created successfully 🎉 Redirecting to login...");
+            setSuccess("Account created successfully 🎉");
+
             setTimeout(() => {
                 resetForm();
-                setIsSignUp(false); // switch to login
+                setIsSignUp(false);
             }, 1500);
         } catch (err) {
             setError(err.response?.data?.message || "Registration failed");
@@ -90,48 +95,67 @@ function LoginModern({ onLoginSuccess }) {
         <div className="login-layout">
             <div className="login-wrapper">
                 <div className={`loginPage ${isSignUp ? "active" : ""}`}>
+
+                    {/* ================= SIGN UP ================= */}
                     <div className="form-container sign-up">
                         <form onSubmit={handleRegister}>
                             <h1>Create Account</h1>
 
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="Username"
-                                value={form.username}
-                                onChange={handleChange}
-                                required
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={form.email}
-                                onChange={handleChange}
-                                required
-                            />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="Password"
-                                value={form.password}
-                                onChange={handleChange}
-                                required
-                            />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Confirm Password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                            />
+                            {/* Username */}
+                            <div className="input-wrapper">
+                                <input
+                                    type="text"
+                                    name="username"
+                                    placeholder="Username"
+                                    value={form.username}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
 
-                            <span
-                                className="eye-icon"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? "🙈" : "👁"}
-                            </span>
+                            {/* Email */}
+                            <div className="input-wrapper">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+
+                            {/* Password */}
+                            <div className="password-wrapper">
+                                <input
+                                    type={showSignUpPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="Password"
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span
+                                    onClick={() =>
+                                        setShowSignUpPassword(!showSignUpPassword)
+                                    }
+                                >
+                                    {showSignUpPassword ? "🙈" : "👁"}
+                                </span>
+                            </div>
+
+                            {/* Confirm Password */}
+                            <div className="input-wrapper">
+                                <input
+                                    type={showSignUpPassword ? "text" : "password"}
+                                    placeholder="Confirm Password"
+                                    value={confirmPassword}
+                                    onChange={(e) =>
+                                        setConfirmPassword(e.target.value)
+                                    }
+                                    required
+                                />
+                            </div>
 
                             {error && <p className="error-text">{error}</p>}
                             {success && <p className="success-text">{success}</p>}
@@ -142,33 +166,50 @@ function LoginModern({ onLoginSuccess }) {
                         </form>
                     </div>
 
+                    {/* ================= SIGN IN ================= */}
                     <div className="form-container sign-in">
                         <form onSubmit={handleLogin}>
                             <h1>Sign In</h1>
 
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="Username"
-                                value={form.username}
-                                onChange={handleChange}
-                                required
-                            />
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password"
-                                value={form.password}
-                                onChange={handleChange}
-                                required
-                            />
+                            {/* Username */}
+                            <div className="input-wrapper">
+                                <input
+                                    type="text"
+                                    name="username"
+                                    placeholder="Username"
+                                    value={form.username}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+
+                            {/* Password */}
+                            <div className="password-wrapper">
+                                <input
+                                    type={showSignInPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="Password"
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span
+                                    onClick={() =>
+                                        setShowSignInPassword(!showSignInPassword)
+                                    }
+                                >
+                                    {showSignInPassword ? "🙈" : "👁"}
+                                </span>
+                            </div>
 
                             {error && <p className="error-text">{error}</p>}
                             {success && <p className="success-text">{success}</p>}
 
                             <p
                                 className="forgot-link"
-                                onClick={() => navigate("/forgot-password")}
+                                onClick={() =>
+                                    navigate("/forgot-password")
+                                }
                             >
                                 Forgot Password?
                             </p>
@@ -179,12 +220,12 @@ function LoginModern({ onLoginSuccess }) {
                         </form>
                     </div>
 
-                    {/* ========== TOGGLE ========== */}
+                    {/* ================= TOGGLE ================= */}
                     <div className="toggle-container">
                         <div className="toggle">
                             <div className="toggle-panel toggle-left">
                                 <h1>Welcome Back!</h1>
-                                <p>Enter your personal details to use all site features</p>
+                                <p>Enter your details to continue</p>
                                 <button
                                     className="hidden"
                                     onClick={() => {
@@ -197,8 +238,8 @@ function LoginModern({ onLoginSuccess }) {
                             </div>
 
                             <div className="toggle-panel toggle-right">
-                                <h1>Hello, Friend!</h1>
-                                <p>Register with your personal details to use all site features</p>
+                                <h1>Hello!</h1>
+                                <p>Register to get started</p>
                                 <button
                                     className="hidden"
                                     onClick={() => {
@@ -211,9 +252,11 @@ function LoginModern({ onLoginSuccess }) {
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     );
 }
+
 export default LoginModern;
