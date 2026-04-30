@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../CSS/MyApp.css";
+import "../css/MyApp.css";
 
 function MyApp() {
     return (

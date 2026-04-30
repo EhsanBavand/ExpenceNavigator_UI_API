@@ -6,7 +6,7 @@ const isDev = import.meta.env.DEV;
 // 🔹 Base URL changes automatically
 const API_BASE_URL = isDev
     ? "/api" // local (proxy to backend)
-    : "https://www.maisonwebapp.com/api"; // production
+    : "http://www.maisonwebapp.com/api"; // production
 
 export const login = async (credentials) => {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);

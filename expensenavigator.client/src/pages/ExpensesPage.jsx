@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Button, Modal, Form, Alert } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
-import "../CSS/Expenses.css";
+import "../css/Expenses.css";
 
 import { ExpenseForm } from "../components/Expenses/ExpenseForm";
 import { CategoryForm } from "../components/Expenses/CategoryForm";

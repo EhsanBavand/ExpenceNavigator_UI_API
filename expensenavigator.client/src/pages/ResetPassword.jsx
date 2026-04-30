@@ -1,7 +1,7 @@
 ﻿import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { resetPassword } from "../services/api";
-import "../CSS/LoginModern.css";
+import "../css/LoginModern.css";
 function ResetPasswordModern() {
     const query = new URLSearchParams(useLocation().search);
     const email = query.get("email");

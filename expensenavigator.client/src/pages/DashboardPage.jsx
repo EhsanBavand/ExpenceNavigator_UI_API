@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import CategoryChart from "../components/Dashboard/CategoryChart";
 import SubCategoryPieChart from "../components/Dashboard/SubCategoryChart";
-import "../CSS/dashboard.css";
+import "../css/dashboard.css";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {

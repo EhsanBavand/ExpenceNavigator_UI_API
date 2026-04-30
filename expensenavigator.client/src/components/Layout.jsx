@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import TitleBar from "./TitleBar";
 import { Container } from "react-bootstrap";
-import "../CSS/Layout.css";
-import "../CSS/modern-theme.css";
+import "../css/Layout.css";
+import "../css/modern-theme.css";
 
 const Layout = ({ children, onLogout }) => {
     const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);

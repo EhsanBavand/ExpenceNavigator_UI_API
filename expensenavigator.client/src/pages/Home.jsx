@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../CSS/Home.css";
+import "../css/Home.css";
 
 function Home() {
     useEffect(() => {

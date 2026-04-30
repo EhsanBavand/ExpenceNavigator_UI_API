@@ -1,4 +1,4 @@
-import "../CSS/Contact.css";
+import "../css/Contact.css";
 import { useState } from "react";
 import { sendContactMessage } from "../services/api";
 

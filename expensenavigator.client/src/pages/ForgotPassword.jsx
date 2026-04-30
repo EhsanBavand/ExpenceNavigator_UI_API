@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { forgotPassword } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import "../CSS/LoginModern.css";
+import "../css/LoginModern.css";
 function ForgotPasswordModern() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");

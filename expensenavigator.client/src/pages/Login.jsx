@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { login, register } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import "../CSS/LoginModern.css";
+import "../css/LoginModern.css";
 function LoginModern({ onLoginSuccess }) {
     const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
