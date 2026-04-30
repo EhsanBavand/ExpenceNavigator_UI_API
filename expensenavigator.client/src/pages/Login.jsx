@@ -99,7 +99,8 @@ function LoginModern({ onLoginSuccess }) {
                     {/* ================= SIGN UP ================= */}
                     <div className="form-container sign-up">
                         <form onSubmit={handleRegister}>
-                            <h1>Create Account</h1>
+
+                            <h1 className="form-title">Create Account</h1>
 
                             {/* Username */}
                             <div className="input-wrapper">
@@ -145,7 +146,7 @@ function LoginModern({ onLoginSuccess }) {
                             </div>
 
                             {/* Confirm Password */}
-                            <div className="input-wrapper">
+                            <div className="password-wrapper">
                                 <input
                                     type={showSignUpPassword ? "text" : "password"}
                                     placeholder="Confirm Password"
@@ -169,7 +170,8 @@ function LoginModern({ onLoginSuccess }) {
                     {/* ================= SIGN IN ================= */}
                     <div className="form-container sign-in">
                         <form onSubmit={handleLogin}>
-                            <h1>Sign In</h1>
+
+                            <h1 className="form-title">Sign In</h1>
 
                             {/* Username */}
                             <div className="input-wrapper">
@@ -207,9 +209,7 @@ function LoginModern({ onLoginSuccess }) {
 
                             <p
                                 className="forgot-link"
-                                onClick={() =>
-                                    navigate("/forgot-password")
-                                }
+                                onClick={() => navigate("/forgot-password")}
                             >
                                 Forgot Password?
                             </p>
@@ -223,6 +223,7 @@ function LoginModern({ onLoginSuccess }) {
                     {/* ================= TOGGLE ================= */}
                     <div className="toggle-container">
                         <div className="toggle">
+
                             <div className="toggle-panel toggle-left">
                                 <h1>Welcome Back!</h1>
                                 <p>Enter your details to continue</p>
@@ -250,6 +251,7 @@ function LoginModern({ onLoginSuccess }) {
                                     Sign Up
                                 </button>
                             </div>
+
                         </div>
                     </div>
 
